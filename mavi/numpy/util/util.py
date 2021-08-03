@@ -30,6 +30,7 @@ def pres(C, F):
     resop = np.vstack([-L, np.identity(C.shape[1])])
     res = C - F @ L     # by definition, res == np.hstack([F, C]) @ resop
     # [F C] * [I -L]
+    
     return res, resop
 
 ## project C to residual space
@@ -45,12 +46,14 @@ def matrixfact(C):
 def matrixfact_gep(C, N, gamma=1e-9):
     # A = Symmetric(C.T@C)
     # B = Symmetric(N.T@N)
+    
+    # c = np.mean(C, axis=0)
+    # C = C - np.mean(C, axis=0)
 
     A = C.T @ C
     B = N.T @ N
     r = np.linalg.matrix_rank(B, gamma)
     gamma_ = np.mean(np.diag(B))*gamma
-
     d, V = linalg.eigh(A, B+gamma_*np.identity(B.shape[0]))
     d = np.sqrt(np.abs(d))
 
@@ -65,8 +68,6 @@ def matrixfact_gep(C, N, gamma=1e-9):
 
 def argsort(arr, key=None, reverse=False):
     arr_ = enumerate(arr)
-    # print('hoge?',list(arr_))  # uncommenting this make arr_ empty after sorting...why?
-    # arr_ = sorted(list(arr_), key=lambda x: key(x[1]), reverse=reverse)
     arr_ = sorted(arr_, key=lambda x: key(x[1]), reverse=reverse)
     perm = list(zip(*arr_))[0]
     return list(perm)
