@@ -9,6 +9,7 @@ class VanishingIdeal():
         self.basis  = []
         self.eps    = None 
         self.method = None 
+        self.device = 'cpu'
         
     def fit(self, X_, eps, method="grad", max_degree=15, gamma=1e-6, backend='numpy', **kwargs):
         X = X_.float()
@@ -154,3 +155,4 @@ class VanishingIdeal():
     def to(self, device):
         assert(self.backend == 'torch')
         self.basis.to(device)
+        self.device = device
