@@ -1,9 +1,8 @@
 # coding: utf-8
+from mavi.torch.base_class.basis import Basis
 
 import itertools as itr
 from copy import deepcopy
-from mavi.numpy.util.plot import plot
-from mavi.numpy.base_class.basis import Basis
 
 class VanishingIdeal():
     def __init__(self):
@@ -11,7 +10,8 @@ class VanishingIdeal():
         self.eps    = None 
         self.method = None 
         
-    def fit(self, X, eps, method="grad", max_degree=15, gamma=1e-9, backend='numpy', **kwargs):
+    def fit(self, X_, eps, method="grad", max_degree=15, gamma=1e-6, backend='numpy', **kwargs):
+        X = X_.float()
 
         self.load_modules(method, backend)
 
@@ -19,7 +19,9 @@ class VanishingIdeal():
         self.eps = eps
         self.method = method
         self.max_degree = max_degree
-        self.gamma = gamma
+        # NOTE: smaller gamma (e.g., 1e-9) also works for numpy 
+        #       but not for torch because pytorch uses float (not double)
+        self.gamma = gamma  
         self.symbolic = method in ("abm", "abm-gwn")
         self.kwargs = kwargs
 
@@ -57,6 +59,11 @@ class VanishingIdeal():
         self.method = method 
         self.backend = backend
 
+        if backend == 'numpy':
+            from mavi.numpy.util.plot import plot
+        if backend == 'torch':
+            from mavi.torch.util.plot import plot
+
         if method == "grad":
             if backend == 'numpy':
                 from mavi.numpy.basis_construction.grad import Basist, Intermidiate
@@ -65,12 +72,12 @@ class VanishingIdeal():
                 from mavi.numpy.evaluation.numerical_evaluation import evaluate
                 from mavi.numpy.evaluation.numerical_evaluation import gradient
 
-            if backend == 'pytorch':
-                from mavi.pytorch.basis_construction.grad import Basist, Intermidiate
-                from mavi.pytorch.basis_construction.grad import initialize, init_candidates, candidates
-                from mavi.pytorch.basis_construction.grad import construct_basis_t
-                from mavi.pytorch.evaluation.numerical_evaluation import evaluate
-                from mavi.pytorch.evaluation.numerical_evaluation import gradient
+            if backend == 'torch':
+                from mavi.torch.basis_construction.grad import Basist, Intermidiate
+                from mavi.torch.basis_construction.grad import initialize, init_candidates, candidates
+                from mavi.torch.basis_construction.grad import construct_basis_t
+                from mavi.torch.evaluation.numerical_evaluation import evaluate
+                from mavi.torch.evaluation.numerical_evaluation import gradient
 
 
         elif method == "vca": 
@@ -81,12 +88,12 @@ class VanishingIdeal():
                 from mavi.numpy.evaluation.numerical_evaluation import evaluate
                 from mavi.numpy.evaluation.numerical_evaluation import gradient
 
-            if backend == 'pytorch':
-                from mavi.pytorch.basis_construction.vca import Basist, Intermidiate
-                from mavi.pytorch.basis_construction.vca import initialize, init_candidates, candidates
-                from mavi.pytorch.basis_construction.vca import construct_basis_t
-                from mavi.pytorch.evaluation.numerical_evaluation import evaluate
-                from mavi.pytorch.evaluation.numerical_evaluation import gradient
+            if backend == 'torch':
+                from mavi.torch.basis_construction.vca import Basist, Intermidiate
+                from mavi.torch.basis_construction.vca import initialize, init_candidates, candidates
+                from mavi.torch.basis_construction.vca import construct_basis_t
+                from mavi.torch.evaluation.numerical_evaluation import evaluate
+                from mavi.torch.evaluation.numerical_evaluation import gradient
 
         elif method == 'abm':
             if backend == 'numpy':
@@ -96,7 +103,7 @@ class VanishingIdeal():
                 from mavi.numpy.evaluation.symbolic_evaluation import evaluate
                 from mavi.numpy.evaluation.symbolic_evaluation import gradient
 
-            if backend == 'pytorch':
+            if backend == 'torch':
                 ''
 
         elif method == 'abm_gwn':
@@ -107,7 +114,7 @@ class VanishingIdeal():
                 from mavi.numpy.evaluation.symbolic_evaluation import evaluate
                 from mavi.numpy.evaluation.symbolic_evaluation import gradient
 
-            if backend == 'pytorch':
+            if backend == 'torch':
                 ''
         else:
             print("unknown method: %s", method)
@@ -121,13 +128,14 @@ class VanishingIdeal():
         self._evaluate = evaluate
         self._gradient = gradient
 
+        self._plot = plot
 
     def plot(self, X, target='vanishing', 
             n=1000, scale=1.5, x_max=1.0, y_max=1.0,
             z_func=lambda x_, y_: 0.0,
             show=False, splitshow=False):
 
-        plot(self, X, target=target, 
+        self._plot(self, X, target=target, 
             n=n, scale=scale, x_max=x_max, y_max=y_max,
             z_func=z_func,
             show=show, splitshow=splitshow)
@@ -142,3 +150,7 @@ class VanishingIdeal():
             assert(start + len(G) == len(self.basis))
             for Bt, Gt in zip(self.basis[start:], G):
                 Bt.G = Gt
+
+    def to(self, device):
+        assert(self.backend == 'torch')
+        self.basis.to(device)

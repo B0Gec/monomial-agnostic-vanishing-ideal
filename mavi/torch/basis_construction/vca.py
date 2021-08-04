@@ -1,7 +1,7 @@
 import torch
-from mavi.pytorch.base_class.numerical_basis import NBasist as _Basist
-from mavi.pytorch.base_class.numerical_basis import Intermidiate as _Intermidiate
-from mavi.pytorch.util.util import res, pres, matrixfact, blow
+from mavi.torch.base_class.numerical_basis import NBasist as _Basist
+from mavi.torch.base_class.numerical_basis import Intermidiate as _Intermidiate
+from mavi.torch.util.util import res, pres, matrixfact, blow
 
 class Basist(_Basist):
     def __init__(self, G, F):
@@ -21,7 +21,7 @@ def initialize(X, **kwargs):
     F = [torch.ones(1,1)*constant]
     G = [torch.zeros(0,0)]
 
-    FX = np.ones((npoints, 1)) * constant
+    FX = torch.ones(npoints, 1) * constant
 
     interm = Intermidiate(FX)
 

@@ -27,10 +27,10 @@ def dblow(A, B, dA, dB):
 ## extract residual components and projection operator
 def pres(C, F):
     L = np.linalg.lstsq(F, C, rcond=None)[0]
+    # print(L)
     resop = np.vstack([-L, np.identity(C.shape[1])])
     res = C - F @ L     # by definition, res == np.hstack([F, C]) @ resop
     # [F C] * [I -L]
-    
     return res, resop
 
 ## project C to residual space
@@ -62,8 +62,9 @@ def matrixfact_gep(C, N, gamma=1e-9):
 
     d, V = d[valid], V[:, valid]
     gnorms = gnorms[valid]
-
+   
     perm = np.argsort(-d)
+
     return d[perm], V[:, perm]
 
 def argsort(arr, key=None, reverse=False):
