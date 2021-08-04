@@ -17,15 +17,16 @@ class Intermidiate(_Intermidiate):
         super().extend(interm)
         self.dFX = torch.hstack((self.dFX, interm.dFX))
 
-def initialize(X):
+def initialize(X, **kwargs):
+    device = X.device
     npoints, ndims = X.shape
     constant = X.abs().mean()
 
-    F = [torch.ones(1,1)*constant]
-    G = [torch.zeros(0,0)]
+    F = [torch.ones(1,1, device=device)*constant]
+    G = [torch.zeros(0,0, device=device)]
 
-    FX = torch.ones(npoints, 1) * constant
-    dFX = torch.zeros(npoints*ndims, 1)
+    FX = torch.ones(npoints, 1, device=device) * constant
+    dFX = torch.zeros(npoints*ndims, 1, device=device)
 
     interm = Intermidiate(FX, dFX)
 
@@ -34,9 +35,10 @@ def initialize(X):
 
 
 def init_candidates(X, **kwargs):
+    device = X.device
     npoints, ndims = X.shape
     # dX = torch.tile(torch.eye(ndims), (npoints, 1))
-    dX = torch.eye(ndims).repeat((npoints, 1))
+    dX = torch.eye(ndims, device=device).repeat((npoints, 1))
 
     return Intermidiate(X, dX)
 

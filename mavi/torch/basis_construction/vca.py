@@ -15,13 +15,14 @@ class Intermidiate(_Intermidiate):
         super().extend(interm)
 
 def initialize(X, **kwargs):
+    device = X.device
     npoints, ndims = X.shape
     constant = 1./npoints**0.5
 
-    F = [torch.ones(1,1)*constant]
-    G = [torch.zeros(0,0)]
+    F = [torch.ones(1,1, device=device)*constant]
+    G = [torch.zeros(0,0, device=device)]
 
-    FX = torch.ones(npoints, 1) * constant
+    FX = torch.ones(npoints, 1, device=device) * constant
 
     interm = Intermidiate(FX)
 

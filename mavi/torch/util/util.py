@@ -20,12 +20,8 @@ def dblow(A, B, dA, dB):
 
 ## extract residual components and projection operator
 def pres(C, F):
-    # L = torch.lstsq(F, C)[0]
-    # L = torch.lstsq(C, F)[0][:F.shape[1]]
-    # L, res_ = torch.linalg.lstsq(C, F, rcond=None)
     L = torch.linalg.lstsq(F, C)[0]
-    # print(L)
-    resop = torch.vstack([-L, torch.eye(C.shape[1])])
+    resop = torch.vstack([-L, torch.eye(C.shape[1], device=C.device)])
     res = C - F @ L     # by definition, res == torch.hstack([F, C]) @ resop
     return res, resop
 
@@ -34,8 +30,9 @@ def res(C, F, R):
     return torch.hstack([F, C]) @ R
 
 def matrixfact(C):
-    _, d, V = torch.linalg.svd(C, full_matrices=True)
-    return d, V.T
+    V, d, _ = torch.linalg.svd(C.T @ C, full_matrices=True)
+    d = d**0.5
+    return d, V
 
 def matrixfact_gep(C, N, gamma=1e-9):
     '''

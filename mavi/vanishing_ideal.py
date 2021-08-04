@@ -13,7 +13,8 @@ class VanishingIdeal():
         
     def fit(self, X_, eps, method="grad", max_degree=15, gamma=1e-6, backend='numpy', **kwargs):
         X = X_.float()
-
+        self.device = X.device
+        
         self.load_modules(method, backend)
 
         ## set attributes
@@ -154,5 +155,5 @@ class VanishingIdeal():
 
     def to(self, device):
         assert(self.backend == 'torch')
-        self.basis.to(device)
+        if self.basis: self.basis.to(device)
         self.device = device
