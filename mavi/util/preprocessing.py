@@ -34,7 +34,7 @@ class Preprocessor():
         self.keep_dim = keep_dim
 
         print('----------------------')
-        print(f'top {th_id-1} components has {th*100}% power')
+        print(f'top {th_id-1} components has {th*100}% power in total')
         print(f'correpsonding range of epsilon is {self.eps_range} (mean: {self.eps})')
         print('----------------------')
 
