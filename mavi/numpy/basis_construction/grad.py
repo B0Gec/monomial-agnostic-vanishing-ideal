@@ -1,7 +1,8 @@
 import numpy as np
-from mavi.numpy.util.util import res, pres, matrixfact_gep, blow, dblow
+from mavi.numpy.base_class.numerical_basis import Nbasist_fn
 from mavi.numpy.base_class.numerical_basis import NBasist as _Basist
 from mavi.numpy.base_class.numerical_basis import Intermidiate as _Intermidiate
+from mavi.numpy.util.util import res, pres, matrixfact_gep, blow, dblow
 
 class Basist(_Basist):
     def __init__(self, G, F):
@@ -20,15 +21,15 @@ def initialize(X):
     npoints, ndims = X.shape
     constant = np.mean(np.abs(X))
 
-    F = [np.ones((1,1))*constant]
-    G = [np.zeros((0,0))]
+    F0 = Nbasist_fn(np.ones((1,1))*constant)
+    G0 = Nbasist_fn(np.zeros((0,0)))
 
     FX = np.ones((npoints, 1)) * constant
     dFX = np.zeros((npoints*ndims, 1))
 
     interm = Intermidiate(FX, dFX)
 
-    basis0 = Basist(G[0], F[0])
+    basis0 = Basist(G0, F0)
     return [basis0], interm
 
 
@@ -46,15 +47,15 @@ def construct_basis_t(cands, intermidiate, eps, gamma=1e-9):
     CtX, dCtX = cands.FX, cands.dFX
     FX, dFX = intermidiate.FX, intermidiate.dFX
 
-    CtX_, R = pres(CtX, FX)
-    dCtX_ = res(dCtX, dFX, R)
+    CtX_, L = pres(CtX, FX)
+    dCtX_ = res(dCtX, dFX, L)
 
     d, V = matrixfact_gep(CtX_, dCtX_, gamma=gamma)
     # print(d)
 
-    Ft = R @ V[:, d>eps]
-    Gt = R @ V[:, d<=eps]
     FtX = CtX_ @ V[:, d>eps]
     dFtX = dCtX_ @ V[:, d>eps]
+    Ft = Nbasist_fn(V[:, d>eps], L)
+    Gt = Nbasist_fn(V[:, d<=eps], L)
 
     return Basist(Gt, Ft), Intermidiate(FtX, dFtX)

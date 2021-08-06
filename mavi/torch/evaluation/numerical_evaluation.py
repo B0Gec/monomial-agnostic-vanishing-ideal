@@ -17,17 +17,19 @@ def _evaluate_nv(B, X, device='cpu'):
     
     N = X.shape[0]
 
-    Z0 = torch.ones(N, 1, device=device) * F[0]
+    Z0 = F[0].eval(torch.ones(N, 1, device=device))
     if len(F) == 1: return Z0
     
-    Z1 = torch.hstack([Z0, X]) @ F[1]
+    # Z1 = torch.hstack([Z0, X]) @ F[1]
+    Z1 = F[1].eval(Z0, X)
     Z = torch.hstack([Z0, Z1])
 
     Zt = Z1.clone()
 
     for t in range(2, len(F)):
         C = blow(Z1, Zt)
-        Zt = torch.hstack([Z, C]) @ F[t]
+        # Zt = torch.hstack([Z, C]) @ F[t]
+        Zt = F[t].eval(Z, C)
         Z = torch.hstack([Z, Zt])
 
     return Z
@@ -36,14 +38,14 @@ def _evaluate_nv(B, X, device='cpu'):
 def _evaluate_v(B, X, device='cpu'):
     F = B.nonvanishings()
     G = B.vanishings()
-    if torch.all(torch.tensor([gt.numel()==0 for gt in G])):
-        return torch.zeros(len(X), 0, device=device)
+    # if torch.all(torch.tensor([gt.numel()==0 for gt in G])):
+    #     return torch.zeros(len(X), 0, device=device)
 
     N = X.shape[0]
 
-    ZF0 = torch.ones(N, 1, device=device) * F[0]
-    ZF1 = torch.hstack([ZF0, X]) @ F[1]
-    Z1 = torch.hstack([ZF0, X]) @ G[1]
+    ZF0 = F[0].eval(torch.ones(N, 1, device=device))
+    ZF1 = F[1].eval(ZF0, X)
+    Z1 = G[1].eval(ZF0, X)
 
     ZF = torch.hstack([ZF0, ZF1])
     Z = Z1.clone()
@@ -51,8 +53,8 @@ def _evaluate_v(B, X, device='cpu'):
     ZFt = ZF1.clone()
     for t in range(2, len(F)):
         C = blow(ZF1, ZFt)
-        Zt = torch.hstack([ZF, C]) @ G[t]
-        ZFt = torch.hstack([ZF, C]) @ F[t]
+        Zt = G[t].eval(ZF, C)
+        ZFt = F[t].eval(ZF, C)
         ZF = torch.hstack([ZF, ZFt])
         Z = torch.hstack([Z, Zt])
 

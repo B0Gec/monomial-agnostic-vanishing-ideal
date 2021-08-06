@@ -27,34 +27,25 @@ def dblow(A, B, dA, dB):
 ## extract residual components and projection operator
 def pres(C, F):
     L = np.linalg.lstsq(F, C, rcond=None)[0]
-    # print(L)
-    resop = np.vstack([-L, np.identity(C.shape[1])])
-    res = C - F @ L     # by definition, res == np.hstack([F, C]) @ resop
-    # [F C] * [I -L]
-    return res, resop
+    res = C - F @ L     # by definition, res == torch.hstack([F, C]) @ L
+    return res, L
 
 ## project C to residual space
-def res(C, F, R):
-    return np.hstack([F, C]) @ R
+def res(C, F, L):
+    return C - F @ L
 
 def matrixfact(C):
     _, d, Vt = np.linalg.svd(C, full_matrices=True)
     d = np.append(d, np.zeros(Vt.shape[0] - len(d)))
     return d, Vt.T
 
-# def matrixfact_gep(C, N, gamma=1e-9):
 def matrixfact_gep(C, N, gamma=1e-9):
-    # A = Symmetric(C.T@C)
-    # B = Symmetric(N.T@N)
-    
-    # c = np.mean(C, axis=0)
-    # C = C - np.mean(C, axis=0)
-
     A = C.T @ C
     B = N.T @ N
     r = np.linalg.matrix_rank(B, gamma)
     gamma_ = np.mean(np.diag(B))*gamma
     d, V = linalg.eigh(A, B+gamma_*np.identity(B.shape[0]))
+    # d, V = indirect_ged(A, B, gamma=gamma)  a bit slower
     d = np.sqrt(np.abs(d))
 
     gnorms = np.diag(V.T@B@V)
@@ -66,6 +57,20 @@ def matrixfact_gep(C, N, gamma=1e-9):
     perm = np.argsort(-d)
 
     return d[perm], V[:, perm]
+
+def indirect_ged(A, B, gamma=1e-9):
+    '''
+    Reduce GED to two SVD
+    '''
+    Vb, db, _ = np.linalg.svd(B)
+    db += gamma 
+    Vb_ = Vb / (db**0.5)
+
+    A_ = Vb_.T @ A @ Vb_
+    Va, d, _ = np.linalg.svd(A_)
+    V = Vb_ @ Va
+
+    return d, V
 
 def argsort(arr, key=None, reverse=False):
     arr_ = enumerate(arr)

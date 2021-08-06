@@ -1,8 +1,10 @@
 # coding: utf-8
-from mavi.torch.base_class.basis import Basis
-
+from mavi.base_class.basis import Basis
+from jax import jit, partial
 import itertools as itr
 from copy import deepcopy
+# from jax import jit, partial
+# from memory_profiler import profile
 
 class VanishingIdeal():
     def __init__(self):
@@ -10,31 +12,30 @@ class VanishingIdeal():
         self.eps    = None 
         self.method = None 
         self.device = 'cpu'
-        
-    def fit(self, X_, eps, method="grad", max_degree=15, gamma=1e-6, backend='numpy', **kwargs):
-        X = X_.float()
-        self.device = X.device
-        
+
+    def fit(self, X, eps, method="grad", max_degree=15, gamma=1e-6, backend='numpy', **kwargs):
         self.load_modules(method, backend)
+
+        if backend=='torch': self.to(X.device)
 
         ## set attributes
         self.eps = eps
         self.method = method
         self.max_degree = max_degree
-        # NOTE: smaller gamma (e.g., 1e-9) also works for numpy 
-        #       but not for torch because pytorch uses float (not double)
         self.gamma = gamma  
+        # NOTE: smaller gamma (e.g., 1e-9) also works for numpy backend
+        #       but not for torch because pytorch uses float (not double)
         self.symbolic = method in ("abm", "abm-gwn")
         self.kwargs = kwargs
 
         ## initialization
-        basis, intermidiate = self.initialize(X, **kwargs)
+        basis, intermidiate = self.initialize(X, **self.kwargs)
         
-        for t in range(1, max_degree+1):
+        for t in range(1, self.max_degree+1):
             # print("\ndegree %d" % t)
-            cands = self.init_candidates(X, **kwargs) if t == 1 else self.candidates(intermidiate_1, intermidiate_t)
+            cands = self.init_candidates(X, **self.kwargs) if t == 1 else self.candidates(intermidiate_1, intermidiate_t)
             # print('border', [c.as_expr() for c in cands.Fsymb])
-            basist, intermidiate_t = self.construct_basis_t(cands, intermidiate, eps, gamma=gamma)
+            basist, intermidiate_t = self.construct_basis_t(cands, intermidiate, eps, gamma=self.gamma)
             
             basis.append(basist)
             intermidiate.extend(intermidiate_t)
@@ -48,13 +49,21 @@ class VanishingIdeal():
         self.basis = Basis(basis)
         return self
 
+
     def evaluate(self, X, target='vanishing'):
+        # if not self._evaluate_jit:
+        #     eval = lambda X: self._evaluate(self.basis, X, target=target)
+        #     self._evaluate_jit = jit(eval)
+
+        # return self._evaluate_jit(X)
+        # return self._evaluate(self.basis, self.prerocess(X), target=target)
         return self._evaluate(self.basis, X, target=target)
     
     def gradient(self, X, target='vanishing'):
         '''
         Not implemented for symbolic case. Use ```symbolic_evalutation.gradient``` instead.
         '''
+        # return self._gradient(self.basis, self.prerocess(X), target=target)
         return self._gradient(self.basis, X, target=target)
 
     def load_modules(self, method, backend):
@@ -63,6 +72,8 @@ class VanishingIdeal():
 
         if backend == 'numpy':
             from mavi.numpy.util.plot import plot
+        if backend == 'jax':
+            from mavi.jax.util.plot import plot
         if backend == 'torch':
             from mavi.torch.util.plot import plot
 
@@ -73,6 +84,14 @@ class VanishingIdeal():
                 from mavi.numpy.basis_construction.grad import construct_basis_t
                 from mavi.numpy.evaluation.numerical_evaluation import evaluate
                 from mavi.numpy.evaluation.numerical_evaluation import gradient
+                # from mavi.util.preprocessing import Preprocessor
+
+            if backend == 'jax':
+                from mavi.jax.basis_construction.grad import Basist, Intermidiate
+                from mavi.jax.basis_construction.grad import initialize, init_candidates, candidates
+                from mavi.jax.basis_construction.grad import construct_basis_t
+                from mavi.jax.evaluation.numerical_evaluation import evaluate
+                from mavi.jax.evaluation.numerical_evaluation import gradient
 
             if backend == 'torch':
                 from mavi.torch.basis_construction.grad import Basist, Intermidiate
@@ -89,6 +108,14 @@ class VanishingIdeal():
                 from mavi.numpy.basis_construction.vca import construct_basis_t
                 from mavi.numpy.evaluation.numerical_evaluation import evaluate
                 from mavi.numpy.evaluation.numerical_evaluation import gradient
+                # from mavi.util.preprocessing import Preprocessor
+
+            if backend == 'jax':
+                from mavi.jax.basis_construction.vca import Basist, Intermidiate
+                from mavi.jax.basis_construction.vca import initialize, init_candidates, candidates
+                from mavi.jax.basis_construction.vca import construct_basis_t
+                from mavi.jax.evaluation.numerical_evaluation import evaluate
+                from mavi.jax.evaluation.numerical_evaluation import gradient
 
             if backend == 'torch':
                 from mavi.torch.basis_construction.vca import Basist, Intermidiate
@@ -121,6 +148,7 @@ class VanishingIdeal():
         else:
             print("unknown method: %s", method)
 
+        # self.preprocessor = Preprocessor()
 
         self.initialize = initialize
         self.init_candidates = init_candidates
@@ -131,6 +159,15 @@ class VanishingIdeal():
         self._gradient = gradient
 
         self._plot = plot
+
+        if backend == 'jax':
+            self._evaluate_jit = None 
+
+    def prerocess(self, X):
+        if self.with_preprocessing:
+            return self.preprocessor.transform(X)
+        else:
+            return X
 
     def plot(self, X, target='vanishing', 
             n=1000, scale=1.5, x_max=1.0, y_max=1.0,
@@ -157,3 +194,29 @@ class VanishingIdeal():
         assert(self.backend == 'torch')
         if self.basis: self.basis.to(device)
         self.device = device
+
+
+
+def main(X):
+    vi = VanishingIdeal()
+    vi.fit(X.detach().numpy(), 10.0, method="vca", backend='numpy', max_degree=2) 
+
+if __name__ == '__main__':
+    import torch
+    from torchvision.datasets import MNIST
+    from torchvision import transforms 
+    from torch.utils.data import DataLoader
+
+    transform = transforms.Compose([
+    transforms.ToTensor(),
+    transforms.Normalize((0.1307,), (0.3081,))
+    ])
+    mnist_test = MNIST('.', train=False, download=True, transform=transform)
+    dataloader = DataLoader(mnist_test, batch_size=100)
+
+    dataiter = iter(dataloader)
+    images, labels = dataiter.next()  # ミニバッチを一つ取り出す
+    X = images.view(-1, 28*28)
+
+    main(X)
+    print('done!')

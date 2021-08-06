@@ -35,10 +35,11 @@ def _plot2d(vi, X, target='vanishing', n=1000, scale=1.5, x_max=1.0, y_max=1.0, 
     ## set plot setting
     npolys = 0
     if target == 'vanishing':
-        npolys = sum([Gt.shape[-1] for Gt in vi.basis.vanishings()])
+        # npolys = sum([Gt.shape[-1] for Gt in vi.basis.vanishings()])
+        npolys = sum([Bt.n_vanishings() for Bt in vi.basis])
         # npolys = sum([len(Gt) for Gt in vi.basis.vanishings()])
     elif target == 'nonvanishing':
-        npolys = sum([Ft.shape[-1] for Ft in vi.basis.nonvanishings()])
+        npolys = sum([Bt.n_nonvanishings() for Bt in vi.basis])
     else:
         print('unknown target: %s' % target)
 

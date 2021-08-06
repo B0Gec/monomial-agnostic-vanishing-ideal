@@ -1,4 +1,5 @@
 import torch 
+from memory_profiler import profile
 
 def blow(A, B):
     n1, n2 = A.shape[1], B.shape[1]
@@ -19,20 +20,21 @@ def dblow(A, B, dA, dB):
 
 
 ## extract residual components and projection operator
+# @profile()
 def pres(C, F):
-    L = torch.linalg.lstsq(F, C)[0]
-    resop = torch.vstack([-L, torch.eye(C.shape[1], device=C.device)])
-    res = C - F @ L     # by definition, res == torch.hstack([F, C]) @ resop
-    return res, resop
+    L = torch.linalg.lstsq(F, C).solution
+    res = C - F @ L     # by definition, res == torch.hstack([F, C]) @ L
+    return res, L
 
 ## project C to residual space
 def res(C, F, R):
-    return torch.hstack([F, C]) @ R
+    return C - F @ L
 
 def matrixfact(C):
     V, d, _ = torch.linalg.svd(C.T @ C, full_matrices=True)
     d = d**0.5
     return d, V
+
 
 def matrixfact_gep(C, N, gamma=1e-9):
     '''
