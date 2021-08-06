@@ -11,6 +11,7 @@ def evaluate(basis, X, target='vanishing'):
         print('unknown mode: %s' % target)
         exit()
 
+
 def _evaluate_nv(B, X, device='cpu'):
     F = B.nonvanishings()
     
@@ -37,8 +38,6 @@ def _evaluate_nv(B, X, device='cpu'):
 def _evaluate_v(B, X, device='cpu'):
     F = B.nonvanishings()
     G = B.vanishings()
-    # if torch.all(torch.tensor([gt.numel()==0 for gt in G])):
-    #     return torch.zeros(len(X), 0, device=device)
 
     N = X.shape[0]
 
@@ -76,7 +75,7 @@ def _gradient_nv(B, X):
     dZ0 = np.zeros((npoints*ndims, 1))
     if len(F) == 1: 
         return dZ0
-    
+
     Z1 = F[1].eval(Z0, X)
     # dZ1 = np.repeat(F[1][1:, :], npoints, axis=0)
     dZ1 = np.repeat(F[1].V, npoints, axis=0)

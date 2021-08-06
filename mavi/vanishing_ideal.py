@@ -1,18 +1,20 @@
 # coding: utf-8
 from mavi.base_class.basis import Basis
-from jax import jit, partial
 import itertools as itr
 from copy import deepcopy
-# from jax import jit, partial
+from jax import jit, partial
 # from memory_profiler import profile
+import torch.nn as nn 
 
+# class VanishingIdeal(nn.Module):  # no impovement on torch backend
 class VanishingIdeal():
     def __init__(self):
+        super().__init__()
         self.basis  = []
         self.eps    = None 
         self.method = None 
-        self.device = 'cpu'
 
+    # @partial(jit, static_argnums=(0,3,4,5,6,7))
     def fit(self, X, eps, method="grad", max_degree=15, gamma=1e-6, backend='numpy', **kwargs):
         self.load_modules(method, backend)
 
@@ -47,9 +49,13 @@ class VanishingIdeal():
                 break 
         
         self.basis = Basis(basis)
+
+        # if backend == 'jax':
+        #     from jax import jit, partial
+        #     self._evaluate = jit(lambda x: self._evaluate(self.basis, x, target=))
         return self
 
-
+    @partial(jit, static_argnums=(0,2,))
     def evaluate(self, X, target='vanishing'):
         # if not self._evaluate_jit:
         #     eval = lambda X: self._evaluate(self.basis, X, target=target)
@@ -59,6 +65,7 @@ class VanishingIdeal():
         # return self._evaluate(self.basis, self.prerocess(X), target=target)
         return self._evaluate(self.basis, X, target=target)
     
+    @partial(jit, static_argnums=(0,2,))
     def gradient(self, X, target='vanishing'):
         '''
         Not implemented for symbolic case. Use ```symbolic_evalutation.gradient``` instead.
@@ -163,11 +170,11 @@ class VanishingIdeal():
         if backend == 'jax':
             self._evaluate_jit = None 
 
-    def prerocess(self, X):
-        if self.with_preprocessing:
-            return self.preprocessor.transform(X)
-        else:
-            return X
+    # def prerocess(self, X):
+    #     if self.with_preprocessing:
+    #         return self.preprocessor.transform(X)
+    #     else:
+    #         return X
 
     def plot(self, X, target='vanishing', 
             n=1000, scale=1.5, x_max=1.0, y_max=1.0,

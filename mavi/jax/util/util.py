@@ -1,6 +1,6 @@
 import jax.numpy as np
 from jax.scipy.linalg import eigh
-from jax import jit
+from jax import jit, partial
 from sympy.polys.orderings import monomial_key
 
 @jit
@@ -16,7 +16,7 @@ def blow(A, B):
 def dblow(A, B, dA, dB):
     A, B, dA, dB = np.asarray(A), np.asarray(B), np.asarray(dA), np.asarray(dB)
     n1, n2 = A.shape[1], B.shape[1]
-    ndims = np.int(dA.shape[0]/A.shape[0])
+    ndims = dA.shape[0]//A.shape[0]
 
     C = np.repeat(A, n2, axis=-1) * np.tile(B, n1)
     dC1 = np.repeat(np.repeat(A, ndims, axis=0), n2, axis=-1) * np.tile(dB, n1)
@@ -59,6 +59,7 @@ def indirect_ged(A, B, gamma=1e-9):
 
     return d, V
 
+
 def matrixfact_gep(C, N, gamma=1e-9):
     '''
     Unfortunately, jax.scipy.linalg.eigh is the only way of solving generalied eigenvalue problem but it is not implmented yet.
@@ -68,7 +69,7 @@ def matrixfact_gep(C, N, gamma=1e-9):
     B = N.T @ N
     r = np.linalg.matrix_rank(B, gamma)
     gamma_ = np.mean(np.diag(B))*gamma
-    d, V = indirect_ged(A, B, gamma=gamma)
+    d, V = indirect_ged(A, B, gamma=gamma_)
     d = np.sqrt(np.abs(d))
 
     gnorms = np.diag(V.T@B@V)
