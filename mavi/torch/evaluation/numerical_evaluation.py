@@ -75,21 +75,20 @@ def _gradient_nv(B, X, device='cpu'):
     F = B.nonvanishings()
     npoints, ndims = X.shape
 
-    Z0 = torch.ones(npoints, 1, device=device) * F[0]
-    dZ0 = torch.zeros(npoints*ndims, 1, device=device)
+    Z0 = F[0].eval(torch.ones((npoints, 1)))
+    dZ0 = torch.zeros((npoints*ndims, 1))
     if len(F) == 1: 
         return dZ0
-    
-    Z1 = torch.hstack((Z0, X)) @ F[1]
-    # dZ1 = torch.repeat(F[1][1:, :], npoints, axis=0)
-    dZ1 = F[1][1:, :].repeat_interleave(npoints, dim=0)
+
+    Z1 = F[1].eval(Z0, X)
+    dZ1 = F[1].V.repeat_interleave(npoints, dim=0)
     Z, dZ =  torch.hstack((Z0, Z1)), torch.hstack((dZ0, dZ1))
     Zt, dZt = Z1.clone(), dZ1.clone()
 
     for t in range(2,len(F)):
         C, dC = dblow(Z1, Zt, dZ1, dZt)
-        Zt = torch.hstack((Z, C)) @ F[t]
-        dZt  = torch.hstack((dZ, dC)) @ F[t]
+        Zt = F[t].eval(Z, C)
+        dZt  = F[t].eval(dZ, dC)
         Z, dZ = torch.hstack((Z, Zt)), torch.hstack((dZ, dZt))
 
     return dZ
@@ -99,25 +98,77 @@ def _gradient_v(B, X, device='cpu'):
     G = B.vanishings()
     npoints, ndims = X.shape
 
-    ZF0 = torch.ones(npoints, 1, device=device) * F[0]
-    dZF0 = torch.zeros(npoints*ndims, 1, device=device)
+    ZF0 = F[0].eval(torch.ones((npoints, 1)))
+    dZF0 = torch.zeros((npoints*ndims, 1))
     if len(F) == 1: 
         return dZF0
     
-    ZF1 = torch.hstack((ZF0, X)) @ F[1]
-    dZF1 = F[1][1:, :].repeat_interleave(npoints, dim=0)
+    ZF1 = F[1].eval(ZF0, X)
+    dZF1 = F[1].V.repeat_interleave(npoints, dim=0)
     ZF, dZF =  torch.hstack((ZF0, ZF1)), torch.hstack((dZF0, dZF1))
     ZFt, dZFt = ZF1.clone(), dZF1.clone()
 
-    dZ = G[1][1:,:].repeat_interleave(npoints, dim=0)
+    dZ = G[1].V.repeat_interleave(npoints, dim=0)
 
     for t in range(2,len(F)):
         C, dC = dblow(ZF1, ZFt, dZF1, dZFt)
-        ZFt = torch.hstack((ZF, C)) @ F[t]
-        dZFt  = torch.hstack((dZF, dC)) @ F[t]
-        dZt  = torch.hstack((dZF, dC)) @ G[t]
+        ZFt = F[t].eval(ZF, C)
+        dZFt  = F[t].eval(dZF, dC)
+        dZFt  = F[t].eval(dZF, dC)
+        dZt  = G[t].eval(dZF, dC)
         ZF, dZF = torch.hstack((ZF, ZFt)), torch.hstack((dZF, dZFt))
         dZ = torch.hstack((dZ, dZt))
     return dZ
+
+# def _gradient_nv(B, X, device='cpu'):
+#     F = B.nonvanishings()
+#     npoints, ndims = X.shape
+
+#     Z0 = torch.ones(npoints, 1, device=device) * F[0]
+#     dZ0 = torch.zeros(npoints*ndims, 1, device=device)
+
+
+#     if len(F) == 1: 
+#         return dZ0
+    
+#     Z1 = torch.hstack((Z0, X)) @ F[1]
+#     # dZ1 = torch.repeat(F[1][1:, :], npoints, dim=0)
+#     dZ1 = F[1][1:, :].repeat_interleave(npoints, dim=0)
+#     Z, dZ =  torch.hstack((Z0, Z1)), torch.hstack((dZ0, dZ1))
+#     Zt, dZt = Z1.clone(), dZ1.clone()
+
+#     for t in range(2,len(F)):
+#         C, dC = dblow(Z1, Zt, dZ1, dZt)
+#         Zt = torch.hstack((Z, C)) @ F[t]
+#         dZt  = torch.hstack((dZ, dC)) @ F[t]
+#         Z, dZ = torch.hstack((Z, Zt)), torch.hstack((dZ, dZt))
+
+#     return dZ
+
+# def _gradient_v(B, X, device='cpu'):
+#     F = B.nonvanishings()
+#     G = B.vanishings()
+#     npoints, ndims = X.shape
+
+#     ZF0 = torch.ones(npoints, 1, device=device) * F[0]
+#     dZF0 = torch.zeros(npoints*ndims, 1, device=device)
+#     if len(F) == 1: 
+#         return dZF0
+    
+#     ZF1 = torch.hstack((ZF0, X)) @ F[1]
+#     dZF1 = F[1][1:, :].repeat_interleave(npoints, dim=0)
+#     ZF, dZF =  torch.hstack((ZF0, ZF1)), torch.hstack((dZF0, dZF1))
+#     ZFt, dZFt = ZF1.clone(), dZF1.clone()
+
+#     dZ = G[1][1:,:].repeat_interleave(npoints, dim=0)
+
+#     for t in range(2,len(F)):
+#         C, dC = dblow(ZF1, ZFt, dZF1, dZFt)
+#         ZFt = torch.hstack((ZF, C)) @ F[t]
+#         dZFt  = torch.hstack((dZF, dC)) @ F[t]
+#         dZt  = torch.hstack((dZF, dC)) @ G[t]
+#         ZF, dZF = torch.hstack((ZF, ZFt)), torch.hstack((dZF, dZFt))
+#         dZ = torch.hstack((dZ, dZt))
+#     return dZ
 
 

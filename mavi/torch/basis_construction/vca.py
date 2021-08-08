@@ -4,8 +4,6 @@ from mavi.torch.base_class.numerical_basis import NBasist as _Basist
 from mavi.torch.base_class.numerical_basis import Intermidiate as _Intermidiate
 from mavi.torch.util.util import res, pres, matrixfact, blow
 
-from memory_profiler import profile
-
 class Basist(_Basist):
     def __init__(self, G, F):
         super().__init__(G, F)
