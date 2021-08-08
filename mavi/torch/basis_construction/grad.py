@@ -29,7 +29,7 @@ def initialize(X, **kwargs):
     FX = torch.ones(npoints, 1, device=device) * constant
     dFX = torch.zeros(npoints*ndims, 1, device=device)
 
-    interm = Intermidiate(FX)
+    interm = Intermidiate(FX, dFX)
 
     basis0 = Basist(G0, F0)
     return [basis0], interm
