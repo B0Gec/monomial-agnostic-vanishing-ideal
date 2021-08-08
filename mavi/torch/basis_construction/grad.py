@@ -1,5 +1,6 @@
 import torch
 from mavi.torch.util.util import pres, res, matrixfact_gep, blow, dblow, grad_normalization_mat
+from mavi.torch.base_class.numerical_basis import Nbasist_fn
 from mavi.torch.base_class.numerical_basis import NBasist as _Basist
 from mavi.torch.base_class.numerical_basis import Intermidiate as _Intermidiate
 from mavi.torch.evaluation.numerical_evaluation import evaluate
@@ -22,17 +23,16 @@ def initialize(X, **kwargs):
     npoints, ndims = X.shape
     constant = X.abs().mean()
 
-    F = [torch.ones(1,1, device=device)*constant]
-    G = [torch.zeros(0,0, device=device)]
+    F0 = Nbasist_fn(torch.ones(1,1, device=device)*constant)
+    G0 = Nbasist_fn(torch.zeros(0,0, device=device))
 
     FX = torch.ones(npoints, 1, device=device) * constant
     dFX = torch.zeros(npoints*ndims, 1, device=device)
 
-    interm = Intermidiate(FX, dFX)
+    interm = Intermidiate(FX)
 
-    basis0 = Basist(G[0], F[0])
+    basis0 = Basist(G0, F0)
     return [basis0], interm
-
 
 def init_candidates(X, **kwargs):
     device = X.device
