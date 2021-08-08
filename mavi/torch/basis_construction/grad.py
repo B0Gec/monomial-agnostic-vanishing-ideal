@@ -51,15 +51,15 @@ def construct_basis_t(cands, intermidiate, eps, gamma=1e-6):
     CtX, dCtX = cands.FX, cands.dFX
     FX, dFX = intermidiate.FX, intermidiate.dFX
 
-    CtX_, R = pres(CtX, FX)
-    dCtX_ = res(dCtX, dFX, R)
+    CtX_, L = pres(CtX, FX)
+    dCtX_ = res(dCtX, dFX, L)
     # dCtX_ = grad_normalization_mat(CtX_, cands.X)
     d, V = matrixfact_gep(CtX_, dCtX_, gamma=gamma)
     # print(d)
 
-    Ft = R @ V[:, d>eps]
-    Gt = R @ V[:, d<=eps]
     FtX = CtX_ @ V[:, d>eps]
     dFtX = dCtX_ @ V[:, d>eps]
+    Ft = Nbasist_fn(V[:, d>eps], L)
+    Gt = Nbasist_fn(V[:, d<=eps], L)
 
     return Basist(Gt, Ft), Intermidiate(FtX, dFtX)

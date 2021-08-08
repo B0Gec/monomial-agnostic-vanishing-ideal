@@ -2,7 +2,7 @@
 from mavi.base_class.basis import Basis
 import itertools as itr
 from copy import deepcopy
-from jax import jit, partial
+# from jax import jit, partial
 # from memory_profiler import profile
 import torch.nn as nn 
 
@@ -50,27 +50,19 @@ class VanishingIdeal():
         
         self.basis = Basis(basis)
 
-        # if backend == 'jax':
-        #     from jax import jit, partial
-        #     self._evaluate = jit(lambda x: self._evaluate(self.basis, x, target=))
         return self
 
-    @partial(jit, static_argnums=(0,2,))
+    # Uncomment if you use jax backend only
+    # @partial(jit, static_argnums=(0,2,))
     def evaluate(self, X, target='vanishing'):
-        # if not self._evaluate_jit:
-        #     eval = lambda X: self._evaluate(self.basis, X, target=target)
-        #     self._evaluate_jit = jit(eval)
-
-        # return self._evaluate_jit(X)
-        # return self._evaluate(self.basis, self.prerocess(X), target=target)
         return self._evaluate(self.basis, X, target=target)
     
-    @partial(jit, static_argnums=(0,2,))
+    # Uncomment if you use jax backend only
+    # @partial(jit, static_argnums=(0,2,))
     def gradient(self, X, target='vanishing'):
         '''
         Not implemented for symbolic case. Use ```symbolic_evalutation.gradient``` instead.
         '''
-        # return self._gradient(self.basis, self.prerocess(X), target=target)
         return self._gradient(self.basis, X, target=target)
 
     def load_modules(self, method, backend):
