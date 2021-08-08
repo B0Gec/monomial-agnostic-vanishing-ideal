@@ -3,10 +3,8 @@ from mavi.base_class.basis import Basis
 import itertools as itr
 from copy import deepcopy
 # from jax import jit, partial
-# from memory_profiler import profile
 import torch.nn as nn 
 
-# class VanishingIdeal(nn.Module):  # no impovement on torch backend
 class VanishingIdeal():
     def __init__(self):
         super().__init__()
@@ -14,7 +12,6 @@ class VanishingIdeal():
         self.eps    = None 
         self.method = None 
 
-    # @partial(jit, static_argnums=(0,3,4,5,6,7))
     def fit(self, X, eps, method="grad", max_degree=15, gamma=1e-6, backend='numpy', **kwargs):
         self.load_modules(method, backend)
 
@@ -83,7 +80,6 @@ class VanishingIdeal():
                 from mavi.numpy.basis_construction.grad import construct_basis_t
                 from mavi.numpy.evaluation.numerical_evaluation import evaluate
                 from mavi.numpy.evaluation.numerical_evaluation import gradient
-                # from mavi.util.preprocessing import Preprocessor
 
             if backend == 'jax':
                 from mavi.jax.basis_construction.grad import Basist, Intermidiate
@@ -107,7 +103,6 @@ class VanishingIdeal():
                 from mavi.numpy.basis_construction.vca import construct_basis_t
                 from mavi.numpy.evaluation.numerical_evaluation import evaluate
                 from mavi.numpy.evaluation.numerical_evaluation import gradient
-                # from mavi.util.preprocessing import Preprocessor
 
             if backend == 'jax':
                 from mavi.jax.basis_construction.vca import Basist, Intermidiate
@@ -147,7 +142,6 @@ class VanishingIdeal():
         else:
             print("unknown method: %s", method)
 
-        # self.preprocessor = Preprocessor()
 
         self.initialize = initialize
         self.init_candidates = init_candidates
@@ -161,12 +155,6 @@ class VanishingIdeal():
 
         if backend == 'jax':
             self._evaluate_jit = None 
-
-    # def prerocess(self, X):
-    #     if self.with_preprocessing:
-    #         return self.preprocessor.transform(X)
-    #     else:
-    #         return X
 
     def plot(self, X, target='vanishing', 
             n=1000, scale=1.5, x_max=1.0, y_max=1.0,
