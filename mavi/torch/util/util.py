@@ -1,5 +1,4 @@
 import torch 
-from memory_profiler import profile
 
 def blow(A, B):
     n1, n2 = A.shape[1], B.shape[1]
@@ -27,7 +26,7 @@ def pres(C, F):
     return res, L
 
 ## project C to residual space
-def res(C, F, R):
+def res(C, F, L):
     return C - F @ L
 
 def matrixfact(C):

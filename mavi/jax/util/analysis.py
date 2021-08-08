@@ -1,6 +1,6 @@
 from operator import length_hint
 import jax.numpy as np 
-from mavi.jax.vanishing_ideal import VanishingIdeal
+from mavi.vanishing_ideal import VanishingIdeal
 # from numba import jit
 
 def argfirstnonzero(arr):
