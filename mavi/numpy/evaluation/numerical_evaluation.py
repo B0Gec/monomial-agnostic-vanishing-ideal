@@ -11,6 +11,7 @@ def evaluate(basis, X, target='vanishing'):
         print('unknown mode: %s' % target)
         exit()
 
+
 def _evaluate_nv(B, X, device='cpu'):
     F = B.nonvanishings()
     
@@ -19,7 +20,6 @@ def _evaluate_nv(B, X, device='cpu'):
     Z0 = F[0].eval(np.ones((N, 1)))
     if len(F) == 1: return Z0
     
-    # Z1 = torch.hstack([Z0, X]) @ F[1]
     Z1 = F[1].eval(Z0, X)
     Z = np.hstack([Z0, Z1])
 
@@ -27,7 +27,6 @@ def _evaluate_nv(B, X, device='cpu'):
 
     for t in range(2, len(F)):
         C = blow(Z1, Zt)
-        # Zt = torch.hstack([Z, C]) @ F[t]
         Zt = F[t].eval(Z, C)
         Z = np.hstack([Z, Zt])
 
@@ -37,8 +36,6 @@ def _evaluate_nv(B, X, device='cpu'):
 def _evaluate_v(B, X, device='cpu'):
     F = B.nonvanishings()
     G = B.vanishings()
-    # if torch.all(torch.tensor([gt.numel()==0 for gt in G])):
-    #     return torch.zeros(len(X), 0, device=device)
 
     N = X.shape[0]
 
@@ -76,10 +73,9 @@ def _gradient_nv(B, X):
     dZ0 = np.zeros((npoints*ndims, 1))
     if len(F) == 1: 
         return dZ0
-    
+
     Z1 = F[1].eval(Z0, X)
-    # dZ1 = np.repeat(F[1][1:, :], npoints, axis=0)
-    dZ1 = np.repeat(F[1].V, npoints, axis=0)
+    dZ1 = np.tile(F[1].V, (npoints, 1))
     Z, dZ =  np.hstack((Z0, Z1)), np.hstack((dZ0, dZ1))
     Zt, dZt = deepcopy(Z1), deepcopy(dZ1)
 
@@ -102,17 +98,15 @@ def _gradient_v(B, X):
         return dZF0
     
     ZF1 = F[1].eval(ZF0, X)
-    # dZF1 = np.repeat(F[1].matrix_form()[1:, :], npoints, axis=0)
-    dZF1 = np.repeat(F[1].V, npoints, axis=0)
+    dZF1 = np.tile(F[1].V, (npoints, 1))
     ZF, dZF =  np.hstack((ZF0, ZF1)), np.hstack((dZF0, dZF1))
     ZFt, dZFt = deepcopy(ZF1), deepcopy(dZF1)
 
-    dZ = np.repeat(G[1].V, npoints, axis=0)
+    dZ = np.tile(G[1].V, (npoints, 1))
 
     for t in range(2,len(F)):
         C, dC = dblow(ZF1, ZFt, dZF1, dZFt)
         ZFt = F[t].eval(ZF, C)
-        dZFt  = F[t].eval(dZF, dC)
         dZFt  = F[t].eval(dZF, dC)
         dZt  = G[t].eval(dZF, dC)
         ZF, dZF = np.hstack((ZF, ZFt)), np.hstack((dZF, dZFt))

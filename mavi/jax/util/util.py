@@ -22,8 +22,6 @@ def dblow(A, B, dA, dB):
     dC1 = np.repeat(np.repeat(A, ndims, axis=0), n2, axis=-1) * np.tile(dB, n1)
     dC2 = np.repeat(dA, n2, axis=-1) * np.tile(np.repeat(B, ndims, axis=0), n1)
     dC = dC1 + dC2 
-    # dC = (np.repeat(np.repeat(A, ndims, axis=0), n2, axis=1) * np.tile(dB, n1) 
-    #       + np.repeat(dA, n2, axis=1) * np.tile(np.repeat(B, ndims, axis=0), n1))
     return C, dC
 
 ## extract residual components and projection operator

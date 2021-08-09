@@ -25,7 +25,7 @@ def _plot2d(vi, X, target='vanishing', n=1000, scale=1.5, x_max=1.0, y_max=1.0, 
 
     ## set plot range
     m = X.mean(dim=0)
-    x_max = y_max = X.abs().max()# np.max(np.abs(X))
+    x_max = y_max = X.abs().max().item()# np.max(np.abs(X))
     # x = np.arange(-scale*x_max, scale*x_max, resolution)
     # y = np.arange(-scale*y_max, scale*y_max, resolution)
     x = torch.linspace(-scale*x_max, scale*x_max, 50)

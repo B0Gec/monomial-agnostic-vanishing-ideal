@@ -36,6 +36,7 @@ def initialize(X):
 def init_candidates(X, **kwargs):
     npoints, ndims = X.shape
     dX = np.tile(np.identity(ndims), (npoints, 1))
+
     return Intermidiate(X, dX)
 
 
@@ -51,7 +52,6 @@ def construct_basis_t(cands, intermidiate, eps, gamma=1e-9):
     dCtX_ = res(dCtX, dFX, L)
 
     d, V = matrixfact_gep(CtX_, dCtX_, gamma=gamma)
-    # print(d)
 
     FtX = CtX_ @ V[:, d>eps]
     dFtX = dCtX_ @ V[:, d>eps]
