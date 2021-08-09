@@ -202,7 +202,7 @@ if __name__ == '__main__':
     dataloader = DataLoader(mnist_test, batch_size=100)
 
     dataiter = iter(dataloader)
-    images, labels = dataiter.next()  # ミニバッチを一つ取り出す
+    images, labels = dataiter.next()
     X = images.view(-1, 28*28)
 
     main(X)
