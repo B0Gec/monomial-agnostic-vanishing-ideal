@@ -2,7 +2,6 @@ import torch
 
 def blow(A, B):
     n1, n2 = A.shape[1], B.shape[1]
-    # C = A.repeat_interleave((1, n2)) * B.repeat((1, n1))
     C = A.repeat_interleave(n2, dim=1) * B.repeat((1, n1))
     return C
 
