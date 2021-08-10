@@ -1,7 +1,7 @@
 from jax import jit, partial 
 class Preprocessor():
     def __init__(self, backend='numpy'):
-        self.backend = 'numpy'
+        self.backend = backend
 
     def fit_transform(self, X, th=.95, keep_dim=False):
         '''
