@@ -30,7 +30,7 @@ def res(C, F, L):
 
 def matrixfact(C):
     _, d, Vt = torch.linalg.svd(C, full_matrices=True)
-    d = torch.cat((d, torch.zeros(Vt.shape[0] - len(d))))
+    d = torch.cat((d, torch.zeros(Vt.shape[0] - len(d), device=C.device)))
     return d, Vt.T
 
 def indirect_ged(A, B, gamma=1e-9):
