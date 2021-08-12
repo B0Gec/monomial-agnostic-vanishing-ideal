@@ -50,7 +50,8 @@ def construct_basis_t(cands, intermidiate, eps, gamma=1e-9):
     CtX_, L = pres(CtX, FX)
     dCtX_ = res(dCtX, dFX, L)
 
-    d, V = matrixfact_gep(CtX_, dCtX_, gamma=gamma)
+    nsamples = CtX_.shape[0]
+    d, V = matrixfact_gep(CtX_, dCtX_/nsamples**0.5, gamma=gamma)
     # print(d)
 
     FtX = CtX_ @ V[:, d>eps]

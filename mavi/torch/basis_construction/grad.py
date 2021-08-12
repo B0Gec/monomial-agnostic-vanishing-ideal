@@ -54,8 +54,8 @@ def construct_basis_t(cands, intermidiate, eps, gamma=1e-6):
     CtX_, L = pres(CtX, FX)
     dCtX_ = res(dCtX, dFX, L)
     # dCtX_ = grad_normalization_mat(CtX_, cands.X)
-    d, V = matrixfact_gep(CtX_, dCtX_, gamma=gamma)
-    # print(d)
+    nsamples = CtX_.shape[0]
+    d, V = matrixfact_gep(CtX_, dCtX_ / nsamples**0.5, gamma=gamma)
 
     FtX = CtX_ @ V[:, d>eps]
     dFtX = dCtX_ @ V[:, d>eps]
