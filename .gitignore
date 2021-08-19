@@ -1,7 +1,6 @@
-data
-backyard
+data/
+backyard/
 __pycache__
-
 
 ipynb_checkpoints
 .DS_Store
