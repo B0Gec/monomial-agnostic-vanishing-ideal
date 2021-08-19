@@ -5,7 +5,7 @@ MAVI provides numerical, GPU-backed implementation of approximate basis computat
 
 MAVI includes the following methods: 
 - Numerical methods: Vanishing Component Analysis (VCA; [Livni+, '13]) and its variants Simple Basis Computaition (SBC; [Kera+, '19, '20, '21a]). 
-- Symbolic methods: Approximate Buchberger--M"oller algorithm (ABM; [Limbeck+, '13]) and its variant [Kera+, '21b]. 
+- Symbolic methods: Approximate Buchberger–M"oller algorithm (ABM; [Limbeck+, '13]) and its variant [Kera+, '21b]. 
 
 ## Installation
 ```
@@ -45,14 +45,9 @@ If you find this useful, please cite:
 
 ```
 ## References 
-[Livni+, '13] 
-
-[Limbeck+, '13]
-
-[Kera+, '19]
-
-[Kera+, '20]
-
-[Kera+, '21a]
-
-[Kera+, '21b]
+1. [Livni+, '13]: Livni, R., Lehavi, D., Schein, S., Nachliely, H., Shalev-Shwartz, S., Globerson, A., 2013. Vanishing component analysis. In:  Proceedings of theThirteenth International Conference on Machine Learning (ICML). PMLR, pp. 597–605.
+2. [Limbeck+, '13]: Limbeck, J., 2013. Computation of approximate border bases and applications. Ph.D. thesis, Passau, Universit ̈at Passau.
+3. [Kera+, '19]: Kera, H., Hasegawa, Y., 2019. Spurious vanishing problem in approximate vanishing ideal. IEEE Access 7, pp. 178961–178976.
+4. [Kera+, '20]: Kera, H., Hasegawa, Y., 2020. Gradient boosts the approximate vanishing ideal. In: Proceedings of the Thirty-Fourth AAAI Conference on ArtificialIntelligence (AAAI). AAAI Press, pp. 4428–4425.
+5. [Kera+, '21a]: Kera, H., Hasegawa, Y., 2021. Monomial-agnostic computation of vanishing ideals. arXiv preprint arXiv:2101.00243
+6. [Kera+, '21b]: Kera, H., 2021. Approximate border basis with gradient normalization. arXiv preprint 	arXiv:2101.00401
