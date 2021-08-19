@@ -1,7 +1,7 @@
 # MAVI: Monomial Agnostic Vanishing Ideal
 
 ## Overview
-MAVI provides numerical, GPU-backed implementation of approximate basis computation of vanishing ideals. 
+MAVI provides flexible, numerical, and GPU-backed implementation of approximate basis computation of vanishing ideals. 
 
 MAVI includes the following methods: 
 - Numerical methods: Vanishing Component Analysis (VCA; [Livni+, '13]) and its variants Simple Basis Computaition (SBC; [Kera+, '19, '20, '21a]). 
