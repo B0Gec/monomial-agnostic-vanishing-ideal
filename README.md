@@ -25,7 +25,7 @@ vi.plot(X, target='vanishing', spiltshow=True)
 Please refer to the Jupyter notebooks in `example/`. 
 
 ## Backend
-To meet the various usages, MAVI is implemented in three different backends `numpy`, `jax`, and `pytorch`. Users are recommended to use `jax` because it provides the fastest computation backed by GPU and JIT compilation. `pytorch` can also work with GPU but symbolic methods are not implemented yet. If you use `jax` backend only, you can uncomment two `@partial` decorators at `evaluate` and `gradient` for further accelaration. 
+To meet the various usages, MAVI is implemented in three different backends `numpy`, `jax`, and `pytorch`. Users are recommended to use `jax` because it provides the fastest computation backed by GPU and JIT compilation. `pytorch` can also work with GPU but symbolic methods are not implemented yet. If you use `jax` backend only, you can uncomment two `@partial` decorators at `evaluate()` and `gradient()` for further accelaration. 
 
 ## Citation
 If you find this useful, please cite:
