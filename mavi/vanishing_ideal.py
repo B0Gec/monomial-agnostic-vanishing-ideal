@@ -12,7 +12,7 @@ class VanishingIdeal():
         self.eps    = None 
         self.method = None 
 
-    def fit(self, X, eps, method="grad", max_degree=15, gamma=1e-6, backend='numpy', **kwargs):
+    def fit(self, X, eps, method="grad", max_degree=15, gamma=1e-6, backend='numpy', centered_data=False, **kwargs):
         self.load_modules(method, backend)
 
         if backend=='torch': self.to(X.device)
@@ -22,6 +22,8 @@ class VanishingIdeal():
         self.method = method
         self.max_degree = max_degree
         self.gamma = gamma  
+        self.centered_data = centered_data
+
         # NOTE: smaller gamma (e.g., 1e-9) also works for numpy backend
         #       but not for torch because pytorch uses float (not double)
         self.symbolic = method in ("abm", "abm-gwn")
@@ -34,7 +36,7 @@ class VanishingIdeal():
             # print("\ndegree %d" % t)
             cands = self.init_candidates(X, **self.kwargs) if t == 1 else self.candidates(intermidiate_1, intermidiate_t)
             # print('border', [c.as_expr() for c in cands.Fsymb])
-            basist, intermidiate_t = self.construct_basis_t(cands, intermidiate, eps, gamma=self.gamma)
+            basist, intermidiate_t = self.construct_basis_t(cands, intermidiate, eps, gamma=self.gamma, centered_data=self.centered_data)
             
             basis.append(basist)
             intermidiate.extend(intermidiate_t)
@@ -129,7 +131,7 @@ class VanishingIdeal():
             if backend == 'torch':
                 ''
 
-        elif method == 'abm_gwn':
+        elif method in ('abm-gwn', 'abm_gwn'):
             if backend == 'numpy':
                 from mavi.numpy.basis_construction.abm_gwn import Basist, Intermidiate
                 from mavi.numpy.basis_construction.abm_gwn import initialize, init_candidates, candidates

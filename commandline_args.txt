@@ -1,0 +1,9 @@
+{
+  "save_dir": "experiment/gwn_stability/results/version-jan28-noise5",
+  "data_name": "V1",
+  "extra_dim": 0,
+  "nrun": 1,
+  "nsample": 100,
+  "noise_level": 0.05,
+  "no_preprocessing": false
+}

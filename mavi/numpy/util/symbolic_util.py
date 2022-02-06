@@ -1,4 +1,6 @@
 import numpy as np
+import itertools as itr 
+import sympy as sm 
 from sympy.polys.orderings import monomial_key
 
 from mavi.numpy.util.util import blow, argsort
@@ -60,5 +62,92 @@ def delete_symb_duplicants(FX, Fsymb):
 
 def grad_weighted_norm(f, X): 
     gwn = np.linalg.norm(gradient(f, X))
-    Z = np.linalg.norm(f.degree_list()) * X.shape[0]**0.5
+    Z = np.linalg.norm(f.degree_list()) # * X.shape[0]**0.5
+    # Z = 1./(f.total_degree() + 1)**0.5 # * X.shape[0]**0.5
+
+    # Z = np.linalg.norm(f.degree_list()) * X.shape[0]**0.5
+
+    # print('')
+    # print(f'border term : {f.expr}')
+    # print(f'grad norm   : {gwn}')
+    # print(f'degree_sqsum: {Z} ({f.degree_list()})')
+    # print(f'grad-w norm : {gwn/Z}')
+
+    # Z = X.shape[0]**0.5
+    # print(f'Z = {Z}')
     return gwn / Z
+
+def coefficent_norm(g, numpy=True):
+    assert(type(g) is sm.Poly)
+    return np.linalg.norm(np.asarray(g.coeffs(), dtype=float))
+
+def coeff_set_distance(G1, G2, unsigned=False, normalize=False):
+    ''' 
+    - calcuate the minumum average distance of coefficient vectors aross G1 and G2
+    '''
+    # print(len(G1), len(G2))
+    if len(G1) != len(G2):
+        print(f'G1: {[g.total_degree() for g in G1]}')
+        print(f'G2: {[g.total_degree() for g in G2]}')
+        assert(len(G1) == len(G2))
+    ds = []
+    for G2_ in itr.permutations(G2):
+        d = 0.0
+        for g1, g2 in zip(G1, G2_):
+            d += coeff_distance(g1, g2, unsigned=unsigned, normalize=normalize)
+        ds.append(d / len(G1))
+
+    return np.min(ds)
+
+def coeff_distance(g1, g2, unsigned=False, normalize=False): 
+
+    if unsigned: 
+        return min(coeff_distance(g1, g2, unsigned=False, normalize=normalize), 
+                   coeff_distance(g1, -g2, unsigned=False, normalize=normalize))
+
+    if normalize: 
+        # print('coeff', g1.coeffs())
+        # print('coeff', g2.coeffs())
+        z1 = np.linalg.norm(np.asarray(g1.coeffs(), dtype=float))
+        z2 = np.linalg.norm(np.asarray(g2.coeffs(), dtype=float))
+        g1 = sm.Poly(g1/z1, gens=g1.gens)
+        g2 = sm.Poly(g2/z2, gens=g2.gens)
+        # g1 = sm.monic(g1, order='grevlex')
+        # g2 = sm.monic(g2, order='grevlex')
+        # print(g1.gens, g2.gens)
+
+    '''
+    calculate the dist of coefficient vectors of two polynomials
+    '''
+    return coefficent_norm(g1 - g2, numpy=True)
+
+    # g1_dict = g1.as_dict()
+    # g2_dict = g2.as_dict()
+    # g1_key = set(g1_dict.keys())
+    # g2_key = set(g2_dict.keys())
+    # key_int = g1_key & g2_key
+    # key_uni = g1_key | g2_key
+
+    # d = 0.0
+    # for k in key_uni: 
+    #     # print(k)
+    #     # print(d)
+    #     if k in key_int: 
+    #         d += (g1_dict[k] - g2_dict[k])**2
+    #     else:
+    #         if k in g1_key: 
+    #             d += g1_dict[k]**2
+    #         else: 
+    #             d += g2_dict[k]**2
+    
+    # d = d**0.5
+    # return float(d)
+
+def chop_minor_terms(g, tol=1e-6):
+    d = g.as_dict()
+    gens = g.gens
+    for k in d.keys(): 
+        if d[k] < tol and d[k] > - tol:
+            d[k] = 0
+    h = sm.Poly.from_dict(d, gens=gens)
+    return h 

@@ -56,3 +56,28 @@ class Nbasist_fn():
     def matrix_form(self):
         return np.vstack([-self.L, np.eye(self.L.shape[1])]) @ self.V
 
+class Nbasist_fn_ineq():
+    def __init__(self, V, L=None, bias=0.0):
+        self.V = V
+        self.L = L  
+        self.bias = bias
+
+    def eval(self, Z, C=None):
+        # F0 and G0
+        if self.L is None:  
+            assert(C is None)
+            return Z * self.V 
+
+        assert(not (Z is None))
+        assert(not (C is None))
+        return (C - Z @ self.L) @ self.V + self.bias
+
+    def isempty(self):
+        return self.V.size == 0
+
+    def n_bases(self):
+        return self.V.shape[1]
+
+    def matrix_form(self):
+        print('not properly implemented yet!')
+        return np.vstack([-self.L, np.eye(self.L.shape[1])]) @ self.V
