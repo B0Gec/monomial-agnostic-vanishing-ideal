@@ -10961,3 +10961,51 @@ new range: 9.999999999999159e-07, 0.063001
 new range: 0.0010010000000000002, 0.063001
 [V1, scale=0.1, run #3] abm-gwn: nan,nan
 new range: 9.999999999999159e-07, 0.063001
+[V1, scale=0.1, run #4] abm-gwn: nan,nan
+new range: 0.0010010000000000002, 0.063001
+[V1, scale=0.1, run #5] abm-gwn: nan,nan
+new range: 0.0010010000000000002, 0.063001
+[V1, scale=0.1, run #6] abm-gwn: nan,nan
+new range: 9.999999999999159e-07, 0.063001
+[V1, scale=0.1, run #7] abm-gwn: nan,nan
+new range: 9.999999999999159e-07, 0.063001
+[V1, scale=0.1, run #8] abm-gwn: nan,nan
+new range: 9.999999999999159e-07, 0.063001
+[V1, scale=0.1, run #9] abm-gwn: 0.0009,0.0009
+new range: 0.11001, 1.0000099999999998
+[V1, scale=1.0, run #0] abm: nan,nan
+new range: 0.10001, 1.0000099999999998
+[V1, scale=1.0, run #1] abm: nan,nan
+new range: 0.10001, 1.0000099999999998
+[V1, scale=1.0, run #2] abm: nan,nan
+new range: 0.11001, 1.0000099999999998
+[V1, scale=1.0, run #3] abm: nan,nan
+new range: 0.10001, 1.0000099999999998
+[V1, scale=1.0, run #4] abm: nan,nan
+new range: 0.11001, 1.0000099999999998
+[V1, scale=1.0, run #5] abm: nan,nan
+new range: 0.10001, 1.0000099999999998
+[V1, scale=1.0, run #6] abm: nan,nan
+new range: 0.10001, 1.0000099999999998
+[V1, scale=1.0, run #7] abm: nan,nan
+new range: 0.09001, 1.0000099999999998
+[V1, scale=1.0, run #8] abm: nan,nan
+new range: 0.09001, 1.0000099999999998
+[V1, scale=1.0, run #9] abm: nan,nan
+new range: 0.01001, 0.63001
+[V1, scale=1.0, run #0] abm-gwn: nan,nan
+new range: 9.999999999999593e-06, 0.63001
+[V1, scale=1.0, run #1] abm-gwn: nan,nan
+new range: 9.999999999999593e-06, 0.63001
+[V1, scale=1.0, run #2] abm-gwn: nan,nan
+new range: 0.01001, 0.63001
+[V1, scale=1.0, run #3] abm-gwn: nan,nan
+new range: 9.999999999999593e-06, 0.63001
+[V1, scale=1.0, run #4] abm-gwn: nan,nan
+new range: 0.01001, 0.63001
+[V1, scale=1.0, run #5] abm-gwn: nan,nan
+new range: 0.01001, 0.63001
+[V1, scale=1.0, run #6] abm-gwn: nan,nan
+new range: 9.999999999999593e-06, 0.63001
+[V1, scale=1.0, run #7] abm-gwn: nan,nan
+new range: 9.999999999999593e-06, 0.63001
