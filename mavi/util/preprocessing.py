@@ -1,4 +1,4 @@
-from jax import jit, partial 
+from jax import jit 
 class Preprocessor():
     def __init__(self, backend='numpy'):
         self.backend = backend

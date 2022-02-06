@@ -1,4 +1,5 @@
 import jax.numpy as np 
+from jax import jit
 from copy import deepcopy
 from mavi.jax.util.util import blow, dblow
 
@@ -11,7 +12,7 @@ def evaluate(basis, X, target='vanishing'):
         print('unknown mode: %s' % target)
         exit()
 
-
+# @jit
 def _evaluate_nv(B, X, device='cpu'):
     F = B.nonvanishings()
     
@@ -32,7 +33,7 @@ def _evaluate_nv(B, X, device='cpu'):
 
     return Z
 
-
+# @jit
 def _evaluate_v(B, X, device='cpu'):
     F = B.nonvanishings()
     G = B.vanishings()
@@ -65,6 +66,7 @@ def gradient(basis, X, target='vanishing'):
     else:
         print('unknown mode %s' % target)
 
+# @jit
 def _gradient_nv(B, X):
     F = B.nonvanishings()
     npoints, ndims = X.shape
@@ -87,6 +89,7 @@ def _gradient_nv(B, X):
 
     return dZ
 
+# @jit
 def _gradient_v(B, X):
     F = B.nonvanishings()
     G = B.vanishings()

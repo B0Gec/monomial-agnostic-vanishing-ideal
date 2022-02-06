@@ -1,5 +1,6 @@
 import jax.numpy as np 
 import sympy as sm 
+from jax import jit 
 from mavi.jax.util.util import blow, dblow
 # from functools import lru_cache
 
@@ -12,9 +13,11 @@ def evaluate(basis, X, target='vanishing'):
         print('unknown mode: %s' % target)
         exit()
 
+@jit
 def _evaluate(F, X):
     return np.vstack([__evaluate(f, X) for f in F]).T
 
+@jit
 def __evaluate(f, X):
     assert(type(f).__name__ == 'Poly')
     if f.total_degree() == 0:
@@ -28,6 +31,6 @@ def gradient(f, X):
     # dfX = __evaluate(_gradient_op(f)[0], X)
     # return np.vstack([__evaluate(df, X) for df in _gradient_op(f)])
 
-# @lru_cache()
+@jit
 def _gradient_op(f):
     return [sm.diff(f, x) for x in f.gens]

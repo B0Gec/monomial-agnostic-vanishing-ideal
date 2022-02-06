@@ -7,7 +7,21 @@ def argfirstnonzero(arr):
     return (np.asarray(arr) != 0).tolist().index(True)
 
 def find_eps_range(X, method, conds, lb=1e-3, ub=1.0, step=1e-3, **kwargs): 
-    return _find_eps_range(X, method, conds, lb, ub, step, **kwargs)
+    assert(conds['npolys'][0] == 0)
+
+    ## First determine the (lb, ub), where linear condition holds.
+    if conds['npolys'][1] > 0:
+        lconds = {'npolys': conds['npolys'][:2], 'cmp': conds['cmp'][:2]}
+        # print(lconds)
+        lb, ub = _find_eps_range(X, method, lconds, lb, ub, step*10, **kwargs)
+        lb, ub = lb - 10*step, ub + 10*step
+        print(f'new range: {lb}, {ub}', flush=True)
+
+    if np.any(np.isnan([lb, ub])):
+        return (lb, ub)
+    else:
+        return _find_eps_range(X, method, conds, lb, ub, step, **kwargs)
+
 
 # @jit
 def _find_eps_range(X, method, conds, lb, ub, step, **kwargs):
@@ -17,8 +31,9 @@ def _find_eps_range(X, method, conds, lb, ub, step, **kwargs):
     lb_, ub_ = (np.nan, np.nan)
     for eps in np.arange(lb, ub, step):
         vi = VanishingIdeal()
-        vi.fit(X, eps, method=method, max_degree=len(npolys)+1, **kwargs)
+        vi.fit(X, eps, method=method, max_degree=len(npolys)-1, **kwargs)
 
+        if len(vi.basis) < len(cmps): continue
         
         if (np.isnan(lb_) 
             and condition_checker(vi, npolys, cmps)):

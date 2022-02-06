@@ -1,12 +1,12 @@
 # from math import perm
 # from sympy.logic.boolalg import term_to_integer
 # from sympy.utilities.iterables import filter_symbols
-from mavi.numpy.base_class.symbolic_basis import SBasist as _Basist
-from mavi.numpy.base_class.symbolic_basis import Intermidiate as _Intermidiate
-from mavi.numpy.util.util import matrixfact, blow, argsort
-from mavi.numpy.util.symbolic_util import border_terms
+from mavi.jax.base_class.symbolic_basis import SBasist as _Basist
+from mavi.jax.base_class.symbolic_basis import Intermidiate as _Intermidiate
+from mavi.jax.util.util import matrixfact, blow, argsort
+from mavi.jax.util.symbolic_util import border_terms
 
-import numpy as np
+import jax.numpy as np
 import sympy as sm 
 from sympy.polys.orderings import monomial_key
 
@@ -66,10 +66,6 @@ def construct_basis_t(cands, intermidiate, eps, **kwargs):
         bX = CtX[:, i].reshape(-1, 1)
         M = np.hstack([FX, FtX, bX])
         d, V = matrixfact(M)
-
-        # print('')
-        # print([f.as_expr() for f in Fsymb] + [f.as_expr() for f in Ftsymb] + [bterm.as_expr()])
-        # print(d)
 
         if np.min(d) > eps: 
             Ftsymb.append(bterm)

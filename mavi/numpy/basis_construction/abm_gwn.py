@@ -49,9 +49,7 @@ def init_candidates(X, term_order='grevlex'):  # mush have gen & term_order as k
     cands = X[:, perm]
     cands_symb = np.asarray(cands_symb)[perm].tolist()
 
-    # gwn = np.ones(len(perm)) # / nsamples**0.5
     gwn = np.asarray([grad_weighted_norm(cand, X) for cand in cands_symb])
-    # print(f'init gwn: {gwn}')
     
     return Intermidiate(cands, cands_symb, gwn, gens, term_order, X=X)
 

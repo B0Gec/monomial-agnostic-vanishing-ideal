@@ -63,20 +63,19 @@ def construct_basis_t(cands, intermidiate, eps, **kwargs):
     Gtsymb = []
     FtX = np.zeros((FX.shape[0], 0))
 
-    start_index = 1 if kwargs['centered_data'] else 0
     
     # degree = cands.Fsymb[0].total_degree()
     for i, bterm in enumerate(cands.Fsymb): 
         bX = CtX[:, i].reshape(-1, 1)
         M = np.hstack([FX, FtX, bX])
-        M = M[:, start_index:]
+        M = M
         d, V = matrixfact(M)
 
         if np.min(d) > eps: 
             Ftsymb.append(bterm)
             FtX = np.hstack([FtX, bX])
         else: 
-            g = sum((Fsymb[start_index:] + Ftsymb + [bterm]) * V[:, np.argmin(d)])
+            g = sum((Fsymb + Ftsymb + [bterm]) * V[:, np.argmin(d)])
             Gtsymb.append(g)
 
     return (Basist(Gtsymb, Ftsymb), 

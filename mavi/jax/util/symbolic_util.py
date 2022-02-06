@@ -1,5 +1,7 @@
 import jax.numpy as np
 from sympy.polys.orderings import monomial_key
+import sympy as sm 
+from sympy.polys.orderings import monomial_key
 
 from mavi.jax.util.util import blow, argsort
 from mavi.jax.evaluation.symbolic_evaluation import gradient
@@ -60,5 +62,54 @@ def delete_symb_duplicants(FX, Fsymb):
 
 def grad_weighted_norm(f, X): 
     gwn = np.linalg.norm(gradient(f, X))
-    Z = np.linalg.norm(f.degree_list()) * X.shape[0]**0.5
+    Z = np.linalg.norm(f.degree_list()) # * X.shape[0]**0.5
+
     return gwn / Z
+
+def coefficent_norm(g, numpy=True):
+    assert(type(g) is sm.Poly)
+    return np.linalg.norm(np.asarray(g.coeffs(), dtype=float))
+
+def coeff_set_distance(G1, G2, unsigned=False, normalize=False):
+    ''' 
+    - calcuate the minumum average distance of coefficient vectors aross G1 and G2
+    '''
+    # print(len(G1), len(G2))
+    if len(G1) != len(G2):
+        print(f'G1: {[g.total_degree() for g in G1]}')
+        print(f'G2: {[g.total_degree() for g in G2]}')
+        assert(len(G1) == len(G2))
+    ds = []
+    for G2_ in itr.permutations(G2):
+        d = 0.0
+        for g1, g2 in zip(G1, G2_):
+            d += coeff_distance(g1, g2, unsigned=unsigned, normalize=normalize)
+        ds.append(d / len(G1))
+
+    return np.min(ds)
+
+def coeff_distance(g1, g2, unsigned=False, normalize=False): 
+
+    if unsigned: 
+        return min(coeff_distance(g1, g2, unsigned=False, normalize=normalize), 
+                   coeff_distance(g1, -g2, unsigned=False, normalize=normalize))
+
+    if normalize: 
+        z1 = np.linalg.norm(np.asarray(g1.coeffs(), dtype=float))
+        z2 = np.linalg.norm(np.asarray(g2.coeffs(), dtype=float))
+        g1 = sm.Poly(g1/z1, gens=g1.gens)
+        g2 = sm.Poly(g2/z2, gens=g2.gens)
+
+    '''
+    calculate the dist of coefficient vectors of two polynomials
+    '''
+    return coefficent_norm(g1 - g2, numpy=True)
+
+def chop_minor_terms(g, tol=1e-6):
+    d = g.as_dict()
+    gens = g.gens
+    for k in d.keys(): 
+        if d[k] < tol and d[k] > - tol:
+            d[k] = 0
+    h = sm.Poly.from_dict(d, gens=gens)
+    return h 
