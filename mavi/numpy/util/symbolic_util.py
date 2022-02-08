@@ -62,7 +62,7 @@ def delete_symb_duplicants(FX, Fsymb):
 
 def grad_weighted_norm(f, X): 
     gwn = np.linalg.norm(gradient(f, X))
-    Z = np.linalg.norm(f.degree_list()) # * X.shape[0]**0.5
+    Z = np.linalg.norm(f.degree_list()) * X.shape[0]**0.5
 
     return gwn / Z
 

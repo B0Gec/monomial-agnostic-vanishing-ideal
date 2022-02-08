@@ -23,6 +23,8 @@ def initialize(X, term_order='grevlex'):  # mush have term_order as keyword arg
 
     npoints, nvars = X.shape
     constant = 1.
+    # constant = np.mean(np.abs(X))
+    # print(constant)
 
     F = [np.ones((1,1))*constant]
     G = [np.zeros((0,0))]
