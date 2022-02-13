@@ -2,7 +2,7 @@ import numpy as np
 from mavi.numpy.base_class.numerical_basis import Nbasist_fn
 from mavi.numpy.base_class.numerical_basis import NBasist as _Basist
 from mavi.numpy.base_class.numerical_basis import Intermidiate as _Intermidiate
-from mavi.numpy.util.util import res, pres, matrixfact, blow
+from mavi.numpy.util.util import res, pres, matrixfact, blow, blow1
 
 # from memory_profiler import profile
 
@@ -36,8 +36,11 @@ def init_candidates(X, **kwargs):
     return Intermidiate(X)
 
 
-def candidates(int_1, int_t):
-    return Intermidiate(blow(int_1.FX, int_t.FX))
+def candidates(int_1, int_t, degree=None):
+    if degree == 2: 
+        return Intermidiate(blow1(int_1.FX))
+    else:
+        return Intermidiate(blow(int_1.FX, int_t.FX))
 
 # @profile
 def construct_basis_t(cands, intermidiate, eps, **kwargs):

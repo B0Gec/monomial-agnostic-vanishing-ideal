@@ -21,9 +21,11 @@ class Intermidiate(_Intermidiate):
         super().extend(interm)
         self.grad_weights = np.append(self.grad_weights, interm.grad_weights)
 
-def initialize(X, term_order='grevlex'):  # mush have term_order as keyword arg
+def initialize(X, term_order='grevlex', **kwargs):  # mush have term_order as keyword arg
     npoints, nvars = X.shape
     constant = 1.
+    if 'scaled_const' in kwargs:
+        constant = np.mean(np.abs(X)) if kwargs['scaled_const'] else 1
 
     F = [np.ones((1,1))*constant]
     G = [np.zeros((0,0))]
@@ -39,7 +41,7 @@ def initialize(X, term_order='grevlex'):  # mush have term_order as keyword arg
     return [basis0], interm
 
 
-def init_candidates(X, term_order='grevlex'):  # mush have gen & term_order as keyword arg
+def init_candidates(X, term_order='grevlex', **kwargs):  # mush have gen & term_order as keyword arg
     nsamples, nvars = X.shape
 
     gens = sm.symbols(f'x:{nvars}')
@@ -54,7 +56,7 @@ def init_candidates(X, term_order='grevlex'):  # mush have gen & term_order as k
     return Intermidiate(cands, cands_symb, gwn, gens, term_order, X=X)
 
 
-def candidates(int_1, int_t):
+def candidates(int_1, int_t, degree=None):
     cands, cands_symb = border_terms(int_1.FX, int_t.FX, int_1.Fsymb, int_t.Fsymb, int_1.gens, int_1.term_order)
     gwns = np.asarray([grad_weighted_norm(cand, int_1.X) for cand in cands_symb])
     return Intermidiate(cands, cands_symb, gwns, int_1.gens, int_1.term_order)

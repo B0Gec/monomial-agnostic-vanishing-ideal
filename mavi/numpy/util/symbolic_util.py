@@ -113,3 +113,13 @@ def chop_minor_terms(g, tol=1e-6):
             d[k] = 0
     h = sm.Poly.from_dict(d, gens=gens)
     return h 
+
+def support(g):
+    d = g.as_dict()
+    gens = g.gens
+    supp = []
+    for k in d.keys(): 
+        dd = {k: 1}
+        h = sm.Poly.from_dict(dd, gens=gens)
+        supp.append(h)
+    return supp 

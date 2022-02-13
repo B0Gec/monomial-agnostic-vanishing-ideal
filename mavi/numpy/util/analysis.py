@@ -1,6 +1,7 @@
 import numpy as np
 from pandas import concat
 from mavi.vanishing_ideal import VanishingIdeal
+from mavi.numpy.util.symbolic_util import support
 # from numba import jit
 
 def argfirstnonzero(arr):
@@ -12,6 +13,8 @@ def find_eps_range(X, method, conds, criterion='config', lb=1e-3, ub=1.0, step=1
         return find_eps_range_c(X, method, conds, lb=lb, ub=ub, step=step, quiet=quiet, **kwargs)
     if criterion == 'order': 
         return find_eps_range_o(X, method, conds, lb=lb, ub=ub, step=step, quiet=quiet, **kwargs)
+    if criterion == 'structure': 
+        return find_eps_range_s(X, method, conds, lb=lb, ub=ub, step=step, quiet=quiet, **kwargs)
 
 
 def find_eps_range_c(X, method, conds, lb=1e-3, ub=1.0, step=1e-2, quiet=False, **kwargs): 
@@ -47,6 +50,21 @@ def find_eps_range_o(X, method, O, lb=1e-3, ub=1.0, step=1e-2, quiet=False, **kw
         return (lb, ub)
     else:
         return _find_eps_range_o(X, method, O, lb, ub, step, **kwargs)
+
+def find_eps_range_s(X, method, S, lb=1e-3, ub=1.0, step=1e-2, quiet=False, **kwargs): 
+
+    ## First determine the (lb, ub), where linear condition holds.
+    S1 = [s for s in S if s.total_degree() <= 1]
+    lb, ub = _find_eps_range_o(X, method, S1, lb, ub, step*10, **kwargs)
+    # print(O1)
+    lb, ub = lb - 10*step, ub + 10*step
+    if not quiet:
+        print(f'new range: {lb}, {ub}', flush=True)
+
+    if np.any(np.isnan([lb, ub])):
+        return (lb, ub)
+    else:
+        return _find_eps_range_o(X, method, S, lb, ub, step, **kwargs)
 
 # @jit
 def _find_eps_range_c(X, method, conds, lb, ub, step, **kwargs):
@@ -104,6 +122,37 @@ def _find_eps_range_o(X, method, O, lb, ub, step, **kwargs):
         vi.fit(X, eps, method=method, max_degree=max_deg, **kwargs)
 
         ok = set(vi.basis.nonvanishings(concat=True)) == O
+        if not ok: continue
+
+        if (np.isnan(lb_) and ok):
+            lb_ = eps
+            # print(f'{lb_} ---> ', end='')
+
+        if (np.isnan(ub_) 
+            and not np.isnan(lb_)
+            and not ok):
+
+            ub_ = max(lb_, eps - step)
+            break
+            
+    if np.isnan(ub_) and not np.isnan(lb_):
+        ub_ = eps
+        # print(ub)
+
+    return (lb_, ub_)
+
+def _find_eps_range_s(X, method, S, lb, ub, step, **kwargs):
+
+    max_deg = np.max([s.total_degree() for s in S])
+    S = set(S)
+    # print(lb, ub, step)
+    lb_, ub_ = (np.nan, np.nan)
+    for eps in np.arange(lb, ub, step):
+        # print(f'eps = {eps}')
+        vi = VanishingIdeal()
+        vi.fit(X, eps, method=method, max_degree=max_deg, **kwargs)
+
+        ok = set().union(*[set(support(g)) for g in vi.basis.vanishings(concat=True)]) == S
         if not ok: continue
 
         if (np.isnan(lb_) and ok):

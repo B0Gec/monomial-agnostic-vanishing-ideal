@@ -33,7 +33,7 @@ class VanishingIdeal():
         
         for t in range(1, self.max_degree+1):
             # print("\ndegree %d" % t)
-            cands = self.init_candidates(X, **self.kwargs) if t == 1 else self.candidates(intermidiate_1, intermidiate_t)
+            cands = self.init_candidates(X, **self.kwargs) if t == 1 else self.candidates(intermidiate_1, intermidiate_t, degree=t)
             # print('border', [c.as_expr() for c in cands.Fsymb])
             basist, intermidiate_t = self.construct_basis_t(cands, intermidiate, eps, gamma=self.gamma)
             
