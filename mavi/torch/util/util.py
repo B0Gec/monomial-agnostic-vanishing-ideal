@@ -1,10 +1,24 @@
 import torch 
 
+def blow1(A):
+    n = A.shape[1]
+    C = A.repeat_interleave(n, dim=1) * A.repeat((1, n))
+    return C
+
 def blow(A, B):
     n1, n2 = A.shape[1], B.shape[1]
     C = A.repeat_interleave(n2, dim=1) * B.repeat((1, n1))
     return C
 
+def dblow1(A, dA):
+    n = A.shape[1]
+    ndims = dA.shape[0]//A.shape[0]
+
+    C = A.repeat_interleave(n, dim=1) * A.repeat((1, n))
+    dC1 = A.repeat_interleave(ndims, dim=0).repeat_interleave(n, dim=1) * dA.repeat((1, n))
+    dC2 = dA.repeat_interleave(n, dim=1) * A.repeat_interleave(ndims, dim=0).repeat((1, n))
+    dC = dC1 + dC2
+    return C, dC
 
 def dblow(A, B, dA, dB):
     n1, n2 = A.shape[1], B.shape[1]

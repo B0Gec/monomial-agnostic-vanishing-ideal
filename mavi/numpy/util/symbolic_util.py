@@ -1,3 +1,4 @@
+import enum
 import numpy as np
 import itertools as itr 
 import sympy as sm 
@@ -123,3 +124,38 @@ def support(g):
         h = sm.Poly.from_dict(dd, gens=gens)
         supp.append(h)
     return supp 
+
+# dot product of coeff vec
+def coeff_dotprod(g1, g2):
+    g1 = g1.as_dict()
+    g2 = g2.as_dict()
+    
+    c = 0.0 
+    for k, v in g1.items(): 
+        c += float(v * g2[k]) if k in g2 else 0.0
+    
+    return c 
+
+# dot product of coeff vec across polys
+def coeff_dotprod_mat(G1, G2, auto=False):
+    m, n = len(G1), len(G2)
+    M = np.zeros((m,n))
+
+    it = itr.combinations_with_replacement(enumerate(G1), 2) if auto else itr.product(enumerate(G1), enumerate(G2))
+    for (i, g1), (j, g2) in it:
+        M[i, j] = coeff_dotprod(g1, g2)
+        if auto:
+            M[j, i] = M[i, j]
+    
+    return M
+
+# dot product of coeff vec across polys
+def coeff_corr_mat(G):
+    return coeff_dotprod_mat(G, G, auto=True)
+
+def sblow1(Asymb):
+    n = len(Asymb)
+    return (np.repeat(Asymb, n) * np.tile(Asymb, n))[:int(n*(n+1)/2)]
+
+def sblow(Asymb, Bsymb): 
+    return np.repeat(Asymb, len(Bsymb)) * np.tile(Bsymb, len(Asymb))

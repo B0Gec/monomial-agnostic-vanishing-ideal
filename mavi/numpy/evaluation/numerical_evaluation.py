@@ -80,7 +80,7 @@ def _gradient_nv(B, X):
     Zt, dZt = deepcopy(Z1), deepcopy(dZ1)
 
     for t in range(2,len(F)):
-        C, dC = dblow(Z1, dZ1) if t == 2 else dblow(Z1, Zt, dZ1, dZt)
+        C, dC = dblow1(Z1, dZ1) if t == 2 else dblow(Z1, Zt, dZ1, dZt)
         Zt = F[t].eval(Z, C)
         dZt  = F[t].eval(dZ, dC)
         Z, dZ = np.hstack((Z, Zt)), np.hstack((dZ, dZt))
@@ -105,7 +105,7 @@ def _gradient_v(B, X):
     dZ = np.tile(G[1].V, (npoints, 1))
 
     for t in range(2,len(F)):
-        C, dC = dblow(ZF1, dZF1) if t == 2 else dblow(ZF1, ZFt, dZF1, dZFt)
+        C, dC = dblow1(ZF1, dZF1) if t == 2 else dblow(ZF1, ZFt, dZF1, dZFt)
         ZFt = F[t].eval(ZF, C)
         dZFt  = F[t].eval(dZF, dC)
         dZt  = G[t].eval(dZF, dC)

@@ -1,5 +1,5 @@
 import torch 
-from mavi.torch.util.util import blow, dblow
+from mavi.torch.util.util import blow, blow1, dblow, dblow1
 
 def evaluate(basis, X_, target='vanishing'):
     X = X_.float()
@@ -27,7 +27,7 @@ def _evaluate_nv(B, X, device='cpu'):
     Zt = Z1.clone()
 
     for t in range(2, len(F)):
-        C = blow(Z1, Zt)
+        C = blow1(Z1) if t == 2 else blow(Z1, Zt)
         # Zt = torch.hstack([Z, C]) @ F[t]
         Zt = F[t].eval(Z, C)
         Z = torch.hstack([Z, Zt])
@@ -52,7 +52,7 @@ def _evaluate_v(B, X, device='cpu'):
     # print([f.shape for f in F[1:]])
     ZFt = ZF1.clone()
     for t in range(2, len(F)):
-        C = blow(ZF1, ZFt)
+        C = blow1(ZF1) if t == 2 else blow(ZF1, ZFt)
         Zt = G[t].eval(ZF, C)
         ZFt = F[t].eval(ZF, C)
         ZF = torch.hstack([ZF, ZFt])
@@ -87,7 +87,7 @@ def _gradient_nv(B, X, device='cpu'):
     Zt, dZt = Z1.clone(), dZ1.clone()
 
     for t in range(2,len(F)):
-        C, dC = dblow(Z1, Zt, dZ1, dZt)
+        C, dC = dblow(Z1, dZ1) if t == 2 else dblow(Z1, Zt, dZ1, dZt)
         Zt = F[t].eval(Z, C)
         dZt  = F[t].eval(dZ, dC)
         Z, dZ = torch.hstack((Z, Zt)), torch.hstack((dZ, dZt))
@@ -114,7 +114,7 @@ def _gradient_v(B, X, device='cpu'):
     dZ = G[1].V.repeat((npoints, 1))
 
     for t in range(2,len(F)):
-        C, dC = dblow(ZF1, ZFt, dZF1, dZFt)
+        C, dC = dblow(ZF1, dZF1) if t == 2 else dblow(ZF1, ZFt, dZF1, dZFt)
         ZFt = F[t].eval(ZF, C)
         dZFt  = F[t].eval(dZF, dC)
         dZt  = G[t].eval(dZF, dC)

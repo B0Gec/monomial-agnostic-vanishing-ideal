@@ -21,3 +21,19 @@ class Basis(UserList):
         for Bt in self.data:
             Bt.F = Bt.F.to(device)
             Bt.G = Bt.G.to(device)
+
+    def cuda(self, device):
+        for Bt in self.data:
+            Bt.F = Bt.F.cuda()
+            Bt.G = Bt.G.cuda()
+
+    def detach(self, device):
+        for Bt in self.data:
+            Bt.F = Bt.F.detach()
+            Bt.G = Bt.G.detach()
+
+    def cpu(self, device):
+        for Bt in self.data:
+            Bt.F = Bt.F.cpu()
+            Bt.G = Bt.G.cpu()
+    

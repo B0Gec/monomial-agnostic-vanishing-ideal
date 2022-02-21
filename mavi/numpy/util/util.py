@@ -8,8 +8,9 @@ def blow1(A):  # if A == B
     # A = F1 = {p1(X), p2, ...}, B = F2 = {q1, q2, ...}
     # output: {p1(X)*q1(X), p1*q2, ....}
     A = np.asarray(A)
-    n = A.shape[-1]
+    m, n = A.shape
     C = np.repeat(A, n, axis=-1) * np.tile(A, n)
+
     return C[:, :int(n*(n+1)/2)]
 
 def blow(A, B):  
@@ -23,7 +24,7 @@ def blow(A, B):
 def dblow1(A, dA):
     A, dA = np.asarray(A), np.asarray(dA)
     n = A.shape[1]
-    ndims = np.int(dA.shape[0]/A.shape[0])
+    ndims = dA.shape[0]//A.shape[0]
 
     C = np.repeat(A, n, axis=-1) * np.tile(A, n)
     dC1 = np.repeat(np.repeat(A, ndims, axis=0), n, axis=-1) * np.tile(dA, n)
@@ -31,12 +32,13 @@ def dblow1(A, dA):
     dC = dC1 + dC2 
     # dC = (np.repeat(np.repeat(A, ndims, axis=0), n2, axis=1) * np.tile(dB, n1) 
     #       + np.repeat(dA, n2, axis=1) * np.tile(np.repeat(B, ndims, axis=0), n1))
+
     return C[:, :int(n*(n+1)/2)], dC[:, :int(n*(n+1)/2)]
 
 def dblow(A, B, dA, dB):
     A, B, dA, dB = np.asarray(A), np.asarray(B), np.asarray(dA), np.asarray(dB)
     n1, n2 = A.shape[1], B.shape[1]
-    ndims = np.int(dA.shape[0]/A.shape[0])
+    ndims = dA.shape[0]//A.shape[0]
 
     C = np.repeat(A, n2, axis=-1) * np.tile(B, n1)
     dC1 = np.repeat(np.repeat(A, ndims, axis=0), n2, axis=-1) * np.tile(dB, n1)
@@ -62,7 +64,7 @@ def matrixfact(C):
     d = np.append(d, np.zeros(Vt.shape[0] - len(d)))
     return d, Vt.T
 
-def matrixfact_gep(C, N, gamma=1e-9, diag_normalizer=False):
+def matrixfact_gep(C, N, gamma=1e-9, diag_normalizer=False, preparedB=False):
 
     if diag_normalizer: 
         if np.all(np.diag(N) > gamma): 
@@ -84,7 +86,7 @@ def matrixfact_gep(C, N, gamma=1e-9, diag_normalizer=False):
             return d, V
 
     A = C.T @ C
-    B = N.T @ N
+    B = N if preparedB else N.T @ N
 
     r = np.linalg.matrix_rank(B, gamma)
     gamma_ = np.mean(np.diag(B))*gamma

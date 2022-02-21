@@ -5,6 +5,15 @@ from sympy.polys.orderings import monomial_key
 # from jax.scipy import linalg
 from mavi.jax.util.jaxgep import eigh
 
+@jit 
+def blow1(A):  # if A == B  
+    # A = F1 = {p1(X), p2, ...}, B = F2 = {q1, q2, ...}
+    # output: {p1(X)*q1(X), p1*q2, ....}
+    A = np.asarray(A)
+    n = A.shape[-1]
+    C = np.repeat(A, n, axis=-1) * np.tile(A, n)
+    return C[:, :int(n*(n+1)/2)]
+
 @jit
 def blow(A, B):  
     # A = F1 = {p1(X), p2, ...}, B = F2 = {q1, q2, ...}
@@ -13,6 +22,20 @@ def blow(A, B):
     n1, n2 = A.shape[-1], B.shape[-1]
     C = np.repeat(A, n2, axis=-1) * np.tile(B, n1)
     return C
+
+@jit 
+def dblow1(A, dA):
+    A, dA = np.asarray(A), np.asarray(dA)
+    n = A.shape[1]
+    ndims = dA.shape[0]//A.shape[0]
+
+    C = np.repeat(A, n, axis=-1) * np.tile(A, n)
+    dC1 = np.repeat(np.repeat(A, ndims, axis=0), n, axis=-1) * np.tile(dA, n)
+    dC2 = np.repeat(dA, n, axis=-1) * np.tile(np.repeat(A, ndims, axis=0), n)
+    dC = dC1  + dC2 
+    # dC = (np.repeat(np.repeat(A, ndims, axis=0), n2, axis=1) * np.tile(dB, n1) 
+    #       + np.repeat(dA, n2, axis=1) * np.tile(np.repeat(B, ndims, axis=0), n1))
+    return C[:, :int(n*(n+1)/2)], dC[:, :int(n*(n+1)/2)]
 
 @jit
 def dblow(A, B, dA, dB):

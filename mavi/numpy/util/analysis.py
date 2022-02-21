@@ -99,7 +99,10 @@ def _find_eps_range_c(X, method, conds, lb, ub, step, **kwargs):
     return (lb_, ub_)
 
 def condition_checker(vi, npolys, cmps, relaxed=False): 
-    ngts = np.asarray([np.asarray(gt).shape[-1] for gt in vi.basis.vanishings()])
+    # print([ g.shape for g in vi.basis.vanishings()])
+    # ngts = np.asarray([np.asarray(gt).shape[-1] for gt in vi.basis.vanishings()])
+    ngts = np.asarray([gt.n_bases() for gt in vi.basis.vanishings()])
+    # ngts = vi.basis.n_vanishings()
     # print(ngts)
     for npoly, ngt, cmp in zip(npolys, ngts, cmps):
         if not cmp_func(npoly, ngt, cmp): return False

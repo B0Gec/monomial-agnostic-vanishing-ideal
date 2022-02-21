@@ -4,6 +4,7 @@ import itertools as itr
 from copy import deepcopy
 # from jax import jit, partial
 import torch.nn as nn 
+import torch 
 
 class VanishingIdeal():
     def __init__(self):
@@ -12,11 +13,13 @@ class VanishingIdeal():
         self.eps    = None 
         self.method = None 
 
-    def fit(self, X, eps, method="grad", max_degree=15, gamma=1e-6, backend='numpy', **kwargs):
+    def fit(self, X, eps, method="grad", max_degree=12, gamma=1e-6, with_coeff=False, backend='numpy', **kwargs):
         self.load_modules(method, backend)
 
-        if backend=='torch': self.to(X.device)
-
+        if backend=='torch': 
+            self.to(X.device)
+            torch.no_grad()
+            
         ## set attributes
         self.eps = eps
         self.method = method
@@ -96,6 +99,27 @@ class VanishingIdeal():
                 from mavi.torch.evaluation.numerical_evaluation import evaluate
                 from mavi.torch.evaluation.numerical_evaluation import gradient
 
+        elif method == "coeff":
+            if backend == 'numpy':
+                from mavi.numpy.basis_construction.coeff import Basist, Intermidiate
+                from mavi.numpy.basis_construction.coeff import initialize, init_candidates, candidates
+                from mavi.numpy.basis_construction.coeff import construct_basis_t
+                from mavi.numpy.evaluation.numerical_evaluation import evaluate
+                from mavi.numpy.evaluation.numerical_evaluation import gradient
+
+            if backend == 'jax':
+                from mavi.jax.basis_construction.grad import Basist, Intermidiate
+                from mavi.jax.basis_construction.grad import initialize, init_candidates, candidates
+                from mavi.jax.basis_construction.grad import construct_basis_t
+                from mavi.jax.evaluation.numerical_evaluation import evaluate
+                from mavi.jax.evaluation.numerical_evaluation import gradient
+
+            if backend == 'torch':
+                from mavi.torch.basis_construction.grad import Basist, Intermidiate
+                from mavi.torch.basis_construction.grad import initialize, init_candidates, candidates
+                from mavi.torch.basis_construction.grad import construct_basis_t
+                from mavi.torch.evaluation.numerical_evaluation import evaluate
+                from mavi.torch.evaluation.numerical_evaluation import gradient
 
         elif method == "vca": 
             if backend == 'numpy':
@@ -149,7 +173,7 @@ class VanishingIdeal():
             if backend == 'torch':
                 ''
         else:
-            print("unknown method: %s", method)
+            print(f"unknown method: {method}")
 
 
         self.initialize = initialize
