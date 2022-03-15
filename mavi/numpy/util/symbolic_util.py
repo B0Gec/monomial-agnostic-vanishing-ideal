@@ -157,7 +157,7 @@ def sblow1(Asymb):
     n = len(Asymb)
     args = list(itr.combinations_with_replacement(range(n), 2))
     args = np.array([a[0]*n+a[1] for a in args])
-    (np.repeat(Asymb, n) * np.tile(Asymb, n))[args]
+    return (np.repeat(Asymb, n) * np.tile(Asymb, n))[args]
 
 
 def sblow(Asymb, Bsymb): 

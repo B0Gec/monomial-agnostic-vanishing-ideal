@@ -1,5 +1,7 @@
 import torch 
 import itertools as itr 
+import numpy as np 
+
 def blow1(A):
     n = A.shape[1]
     C = A.repeat_interleave(n, dim=1) * A.repeat((1, n))
