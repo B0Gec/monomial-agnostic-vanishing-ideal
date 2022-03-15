@@ -50,6 +50,7 @@ def construct_basis_t(cands, intermidiate, eps, **kwargs):
     CtX_, L = pres(CtX, FX)  # orthogonal projection
 
     d, V = matrixfact(CtX_)
+    # print(d)
 
     FtX = CtX_ @ V[:, d>eps]
     scales = np.linalg.norm(FtX, axis=0)

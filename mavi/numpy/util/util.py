@@ -101,11 +101,11 @@ def matrixfact_gep(C, N, gamma=1e-9, diag_normalizer=False, preparedB=False):
     # d, V = indirect_ged(A, B, gamma=gamma)  a bit slower
     d = np.sqrt(np.abs(d))
 
-    # gnorms = np.diag(V.T@B@V)
-    # valid = np.argsort(-gnorms)[:r]
+    gnorms = np.diag(V.T@B@V)
+    valid = np.argsort(-gnorms)[:r]
 
-    # d, V = d[valid], V[:, valid]
-    # gnorms = gnorms[valid]
+    d, V = d[valid], V[:, valid]
+    gnorms = gnorms[valid]
    
     perm = np.argsort(-d)
 
