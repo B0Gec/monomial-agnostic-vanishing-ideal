@@ -19,7 +19,7 @@ class Intermidiate(_Intermidiate):
 
 def initialize(X, **kwargs):
     npoints, ndims = X.shape
-    constant = np.mean(np.abs(X))
+    constant = 1.0 
 
     F0 = Nbasist_fn(np.ones((1,1))*constant)
     G0 = Nbasist_fn(np.zeros((0,0)))
@@ -60,6 +60,9 @@ def construct_basis_t(cands, intermidiate, eps, gamma=1e-9):
     M = coeff_corr_mat(Ctsymb_)
     nsamples = CtX_.shape[0]
     d, V = matrixfact_gep(CtX_, M, gamma=gamma, preparedB=True)
+    # print(V/np.linalg.norm(V, axis=0))
+    # print(CtX)
+    # print(M)
     # print(d)
 
     FtX = CtX_ @ V[:, d>eps]

@@ -1,6 +1,7 @@
 import jax.numpy as np
 from jax.scipy.linalg import eigh
 from jax import jit
+import itertools as itr 
 from sympy.polys.orderings import monomial_key
 # from jax.scipy import linalg
 from mavi.jax.util.jaxgep import eigh
@@ -12,7 +13,11 @@ def blow1(A):  # if A == B
     A = np.asarray(A)
     n = A.shape[-1]
     C = np.repeat(A, n, axis=-1) * np.tile(A, n)
-    return C[:, :int(n*(n+1)/2)]
+
+    args = list(itr.combinations_with_replacement(range(n), 2))
+    args = np.array([a[0]*n+a[1] for a in args])
+
+    return C[:, args]
 
 @jit
 def blow(A, B):  
@@ -35,7 +40,10 @@ def dblow1(A, dA):
     dC = dC1  + dC2 
     # dC = (np.repeat(np.repeat(A, ndims, axis=0), n2, axis=1) * np.tile(dB, n1) 
     #       + np.repeat(dA, n2, axis=1) * np.tile(np.repeat(B, ndims, axis=0), n1))
-    return C[:, :int(n*(n+1)/2)], dC[:, :int(n*(n+1)/2)]
+    args = list(itr.combinations_with_replacement(range(n), 2))
+    args = np.array([a[0]*n+a[1] for a in args])
+
+    return C[:, args], dC[:, args]
 
 @jit
 def dblow(A, B, dA, dB):

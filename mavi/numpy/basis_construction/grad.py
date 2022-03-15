@@ -55,7 +55,7 @@ def construct_basis_t(cands, intermidiate, eps, gamma=1e-9, z=1.0):
 
     nsamples = CtX_.shape[0]
     d, V = matrixfact_gep(CtX_, dCtX_/nsamples**0.5/z, gamma=gamma)
-    # print(np.min(d))
+    print(d)
 
     FtX = CtX_ @ V[:, d>eps]
     dFtX = dCtX_ @ V[:, d>eps]

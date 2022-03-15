@@ -1,9 +1,11 @@
 import torch 
-
+import itertools as itr 
 def blow1(A):
     n = A.shape[1]
     C = A.repeat_interleave(n, dim=1) * A.repeat((1, n))
-    return C
+    args = list(itr.combinations_with_replacement(range(n), 2))
+    args = np.array([a[0]*n+a[1] for a in args])
+    return C[:, args]
 
 def blow(A, B):
     n1, n2 = A.shape[1], B.shape[1]
@@ -18,7 +20,11 @@ def dblow1(A, dA):
     dC1 = A.repeat_interleave(ndims, dim=0).repeat_interleave(n, dim=1) * dA.repeat((1, n))
     dC2 = dA.repeat_interleave(n, dim=1) * A.repeat_interleave(ndims, dim=0).repeat((1, n))
     dC = dC1 + dC2
-    return C, dC
+
+    args = list(itr.combinations_with_replacement(range(n), 2))
+    args = np.array([a[0]*n+a[1] for a in args])
+
+    return C[:, args], dC[:, args]
 
 def dblow(A, B, dA, dB):
     n1, n2 = A.shape[1], B.shape[1]

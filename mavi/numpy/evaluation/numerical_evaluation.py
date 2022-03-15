@@ -57,15 +57,15 @@ def _evaluate_v(B, X, device='cpu'):
     return Z
 
 
-def gradient(basis, X, target='vanishing'):
+def gradient(basis, X, target='vanishing', keep_dim=False):
     if target == 'nonvanishing':
-        return _gradient_nv(basis, X)
+        return _gradient_nv(basis, X, keep_dim=keep_dim)
     elif target == 'vanishing':
-        return _gradient_v(basis, X)        
+        return _gradient_v(basis, X, keep_dim=keep_dim)        
     else:
         print('unknown mode %s' % target)
 
-def _gradient_nv(B, X):
+def _gradient_nv(B, X, keep_dim=False):
     F = B.nonvanishings()
     npoints, ndims = X.shape
 
@@ -85,9 +85,10 @@ def _gradient_nv(B, X):
         dZt  = F[t].eval(dZ, dC)
         Z, dZ = np.hstack((Z, Zt)), np.hstack((dZ, dZt))
 
+    if keep_dim: dZ = dZ.reshape(npoints, ndims, -1)
     return dZ
 
-def _gradient_v(B, X):
+def _gradient_v(B, X, keep_dim=False):
     F = B.nonvanishings()
     G = B.vanishings()
     npoints, ndims = X.shape
@@ -111,5 +112,7 @@ def _gradient_v(B, X):
         dZt  = G[t].eval(dZF, dC)
         ZF, dZF = np.hstack((ZF, ZFt)), np.hstack((dZF, dZFt))
         dZ = np.hstack((dZ, dZt))
+
+    if keep_dim: dZ = dZ.reshape(npoints, ndims, -1)
     return dZ
 

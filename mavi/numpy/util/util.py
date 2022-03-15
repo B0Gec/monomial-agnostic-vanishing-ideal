@@ -3,7 +3,7 @@ from scipy import linalg
 from sympy.polys.orderings import monomial_key
 # import cvxpy as cp 
 from scipy.optimize import minimize
-
+import itertools as itr 
 def blow1(A):  # if A == B  
     # A = F1 = {p1(X), p2, ...}, B = F2 = {q1, q2, ...}
     # output: {p1(X)*q1(X), p1*q2, ....}
@@ -11,7 +11,10 @@ def blow1(A):  # if A == B
     m, n = A.shape
     C = np.repeat(A, n, axis=-1) * np.tile(A, n)
 
-    return C[:, :int(n*(n+1)/2)]
+    args = list(itr.combinations_with_replacement(range(n), 2))
+    args = np.array([a[0]*n+a[1] for a in args])
+    
+    return C[:, args]
 
 def blow(A, B):  
     # A = F1 = {p1(X), p2, ...}, B = F2 = {q1, q2, ...}
@@ -33,7 +36,10 @@ def dblow1(A, dA):
     # dC = (np.repeat(np.repeat(A, ndims, axis=0), n2, axis=1) * np.tile(dB, n1) 
     #       + np.repeat(dA, n2, axis=1) * np.tile(np.repeat(B, ndims, axis=0), n1))
 
-    return C[:, :int(n*(n+1)/2)], dC[:, :int(n*(n+1)/2)]
+    args = list(itr.combinations_with_replacement(range(n), 2))
+    args = np.array([a[0]*n+a[1] for a in args])
+
+    return C[:, args], dC[:, args]
 
 def dblow(A, B, dA, dB):
     A, B, dA, dB = np.asarray(A), np.asarray(B), np.asarray(dA), np.asarray(dB)
@@ -90,15 +96,16 @@ def matrixfact_gep(C, N, gamma=1e-9, diag_normalizer=False, preparedB=False):
 
     r = np.linalg.matrix_rank(B, gamma)
     gamma_ = np.mean(np.diag(B))*gamma
+    
     d, V = linalg.eigh(A, B+gamma_*np.identity(B.shape[0]))
     # d, V = indirect_ged(A, B, gamma=gamma)  a bit slower
     d = np.sqrt(np.abs(d))
 
-    gnorms = np.diag(V.T@B@V)
-    valid = np.argsort(-gnorms)[:r]
+    # gnorms = np.diag(V.T@B@V)
+    # valid = np.argsort(-gnorms)[:r]
 
-    d, V = d[valid], V[:, valid]
-    gnorms = gnorms[valid]
+    # d, V = d[valid], V[:, valid]
+    # gnorms = gnorms[valid]
    
     perm = np.argsort(-d)
 

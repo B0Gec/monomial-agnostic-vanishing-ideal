@@ -60,11 +60,11 @@ class VanishingIdeal():
     
     # Uncomment if you use jax backend only
     # @partial(jit, static_argnums=(0,2,))
-    def gradient(self, X, target='vanishing'):
+    def gradient(self, X, target='vanishing', keep_dim=False):
         '''
         Not implemented for symbolic case. Use ```symbolic_evalutation.gradient``` instead.
         '''
-        return self._gradient(self.basis, X, target=target)
+        return self._gradient(self.basis, X, target=target, keep_dim=keep_dim)
 
     def load_modules(self, method, backend):
         self.method = method 
@@ -82,6 +82,14 @@ class VanishingIdeal():
                 from mavi.numpy.basis_construction.grad import Basist, Intermidiate
                 from mavi.numpy.basis_construction.grad import initialize, init_candidates, candidates
                 from mavi.numpy.basis_construction.grad import construct_basis_t
+                from mavi.numpy.evaluation.numerical_evaluation import evaluate
+                from mavi.numpy.evaluation.numerical_evaluation import gradient
+
+        elif method == "grad-c":
+            if backend == 'numpy':
+                from mavi.numpy.basis_construction.grad_c import Basist, Intermidiate
+                from mavi.numpy.basis_construction.grad_c import initialize, init_candidates, candidates
+                from mavi.numpy.basis_construction.grad_c import construct_basis_t
                 from mavi.numpy.evaluation.numerical_evaluation import evaluate
                 from mavi.numpy.evaluation.numerical_evaluation import gradient
 

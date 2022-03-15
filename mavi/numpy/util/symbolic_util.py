@@ -155,7 +155,10 @@ def coeff_corr_mat(G):
 
 def sblow1(Asymb):
     n = len(Asymb)
-    return (np.repeat(Asymb, n) * np.tile(Asymb, n))[:int(n*(n+1)/2)]
+    args = list(itr.combinations_with_replacement(range(n), 2))
+    args = np.array([a[0]*n+a[1] for a in args])
+    (np.repeat(Asymb, n) * np.tile(Asymb, n))[args]
+
 
 def sblow(Asymb, Bsymb): 
     return np.repeat(Asymb, len(Bsymb)) * np.tile(Bsymb, len(Asymb))
