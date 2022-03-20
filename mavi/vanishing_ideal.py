@@ -85,14 +85,6 @@ class VanishingIdeal():
                 from mavi.numpy.evaluation.numerical_evaluation import evaluate
                 from mavi.numpy.evaluation.numerical_evaluation import gradient
 
-        elif method == "grad-c":
-            if backend == 'numpy':
-                from mavi.numpy.basis_construction.grad_c import Basist, Intermidiate
-                from mavi.numpy.basis_construction.grad_c import initialize, init_candidates, candidates
-                from mavi.numpy.basis_construction.grad_c import construct_basis_t
-                from mavi.numpy.evaluation.numerical_evaluation import evaluate
-                from mavi.numpy.evaluation.numerical_evaluation import gradient
-
             if backend == 'jax':
                 from mavi.jax.basis_construction.grad import Basist, Intermidiate
                 from mavi.jax.basis_construction.grad import initialize, init_candidates, candidates
@@ -106,6 +98,14 @@ class VanishingIdeal():
                 from mavi.torch.basis_construction.grad import construct_basis_t
                 from mavi.torch.evaluation.numerical_evaluation import evaluate
                 from mavi.torch.evaluation.numerical_evaluation import gradient
+
+        elif method == "grad-c":
+            if backend == 'numpy':
+                from mavi.numpy.basis_construction.grad_c import Basist, Intermidiate
+                from mavi.numpy.basis_construction.grad_c import initialize, init_candidates, candidates
+                from mavi.numpy.basis_construction.grad_c import construct_basis_t
+                from mavi.numpy.evaluation.numerical_evaluation import evaluate
+                from mavi.numpy.evaluation.numerical_evaluation import gradient
 
         elif method == "coeff":
             if backend == 'numpy':
