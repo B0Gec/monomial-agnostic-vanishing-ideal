@@ -120,6 +120,9 @@ def construct_basis_t(cands, intermidiate, eps, **kwargs):
             g = sum((Fsymb[start_index:] + Ftsymb + [bterm]) * V[:, np.argmin(d)])
             Gtsymb.append(g)
 
+        print('GF-tsymb', Gtsymb, Ftsymb)
+        print('here')
+
 
     return (Basist(Gtsymb, Ftsymb), 
             Intermidiate(FtX, Ftsymb, FtXgwn, intermidiate.gens, intermidiate.term_order, X=cands.X))

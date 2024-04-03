@@ -1,0 +1,8 @@
+/home/bosg/Documents/py-envs/dmkd/bin/python
+(6000, 2) (6000, 40)
+----------------------
+top 0 components has 95.0% power in total
+correpsonding range of epsilon is (244.94897427831668, 244.94897427831876) (mean: 244.94897427831773)
+----------------------
+(6000, 1)
+Cannot plot 1-variate polynomials

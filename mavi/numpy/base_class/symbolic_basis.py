@@ -27,6 +27,9 @@ class SBasist():
     def isemptyF(self):
         return len(self.F) == 0
 
+    def n_vanishings(self):
+        return len(self.G)
+
 class SBasis(UserList):
     '''
     Structure  : List of SBasis_t

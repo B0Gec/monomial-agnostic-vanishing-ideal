@@ -38,10 +38,22 @@ def _evaluate_v(B, X, device='cpu'):
     G = B.vanishings()
 
     N = X.shape[0]
+    print(F)
+    print(G)
+    print(F[0])
+    print(F[0].eval(np.array([[1]])))
+    print(F[0].eval(np.array([[0]])))
+
+
+
 
     ZF0 = F[0].eval(np.ones((N, 1)))
+    print(ZF0)
     ZF1 = F[1].eval(ZF0, X)
+    print(ZF1)
     Z1 = G[1].eval(ZF0, X)
+    print(Z1)
+
 
     ZF = np.hstack([ZF0, ZF1])
     Z = np.array(Z1)

@@ -38,6 +38,10 @@ def initialize(X, term_order='grevlex', **kwargs):  # mush have term_order as ke
     interm = Intermidiate(FX, Fsymb, gens, term_order)
 
     basis0 = Basist([], [sm.poly(constant, gens=gens)])
+    # print(Fsymb)
+    # print(interm)
+    # print('interm')
+    # print(basis0)
     return [basis0], interm
 
 
@@ -75,6 +79,8 @@ def construct_basis_t(cands, intermidiate, eps, **kwargs):
         M = np.hstack([FX, FtX, bX])
         M = M
         d, V = matrixfact(M)
+        print('bX')
+        print(bX)
 
         if np.min(d) > eps: 
             # print(f'{np.min(d)}')
@@ -86,6 +92,10 @@ def construct_basis_t(cands, intermidiate, eps, **kwargs):
             # print(f'        {bterm.expr}')
             g = sum((Fsymb + Ftsymb + [bterm]) * V[:, np.argmin(d)])
             Gtsymb.append(g)
+
+    print('Ftsymb')
+    print(Ftsymb)
+    print(Gtsymb)
 
     return (Basist(Gtsymb, Ftsymb), 
             Intermidiate(FtX, Ftsymb, intermidiate.gens, intermidiate.term_order))

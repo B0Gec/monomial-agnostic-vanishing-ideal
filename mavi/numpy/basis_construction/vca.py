@@ -55,7 +55,18 @@ def construct_basis_t(cands, intermidiate, eps, **kwargs):
     FtX = CtX_ @ V[:, d>eps]
     scales = np.linalg.norm(FtX, axis=0)
     FtX /= scales
+    print('Ftx')
+    print(FtX)
     Ft = Nbasist_fn(V[:, d>eps] / scales, L)
     Gt = Nbasist_fn(V[:, d<=eps], L)
+    print()
+    print(V)
+    print('eoV')
+    print(L)
+    print('eoL')
+    print(scales)
+    print('eoscales')
+
+
 
     return Basist(Gt, Ft), Intermidiate(FtX)
