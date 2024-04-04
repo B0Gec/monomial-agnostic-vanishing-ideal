@@ -1,9 +1,11 @@
-data/
-backyard/
-experiment/
-__pycache__
-
-
-.ipynb_checkpoints
-.DS_Store
-nohup.out
+.vscode/
+# .gitignore
+__pycache__/
+# */__pycache__/
+ProGED.egg-info/
+.idea/workspace.xml
+.idea/
+*.ipynb_checkpoints
+*/.ipynb_checkpoints
+*~
+#.*
